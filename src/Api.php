@@ -30,10 +30,14 @@ class Api
                             $_POST['action'] = 'create';
                         }
                         if (method_exists($controller, $_POST['action'])) {
-                            $id = $controller->{$_POST['action']}($table);
+                            $controller->{$_POST['action']}($table);
                         }
                         if ($_POST['action'] == 'create') {
-                            return new Endpoint\Item\View($this->adapter, $table, $id);
+                            return new Endpoint\Item\View(
+                                $this->adapter,
+                                $table,
+                                $this->adapter->lastInsertId()
+                            );
                         }
                     }
                     return new Endpoint\Browse\View($this->adapter, $table);
