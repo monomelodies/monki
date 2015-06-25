@@ -1,5 +1,5 @@
 # Monki
-Tools to easily bootstrap and generate APIs.
+Simple API bootstrapper.
 
 ## Installation
 
