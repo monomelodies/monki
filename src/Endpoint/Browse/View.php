@@ -2,52 +2,50 @@
 
 namespace Monki\Endpoint\Browse;
 
-use Disclosure\Injector;
-use Disclosure\Container;
-use Improse\Html;
+use Improse\Json;
+use Dabble\Query\Where;
+use Dabble\Query\Options;
 use PDO;
-use Exception;
+use PDOException;
 
-class View extends Html
+class View extends Json
 {
-    use Injector;
-
     protected $adapter;
-    protected $types = [];
-    protected $id;
-    protected $template = 'Monki/Endpoint/Browse/template.php';
+    protected $table;
 
-    public function __construct($type, $id = null)
+    public function __construct(PDO $adapter, $table)
     {
-        $this->inject(function (PDO $adapter) {});
-        $this->id = $id;
-        switch ($type) {
-            case 'image':
-                $this->types = ['image/jpeg', 'image/jpg', 'image/png'];
-                break;
-        }
+        $this->adapter = $adapter;
+        $this->table = $table;
     }
 
     public function __invoke(array $__viewdata = [])
     {
-        // This is an exception:
-        header("Content-type: text/html", true);
-        try {
-            $where = [];
-            if ($this->types) {
-                $where['mimetype'] = ['IN' => $this->types];
-            }
-            $medias = $this->adapter->fetchAll(
-                'media',
-                '*',
-                $where,
-                ['order' => 'originalname ASC']
-            );
-        } catch (SelectException $e) {
-            $medias = [];
+        $where = isset($_GET['filter']) ?
+            new Where(json_decode($_GET['filter'], true)) :
+            '1=1';
+        $options = isset($_GET['options']) ?
+            new Options(json_decode($_GET['filter'], true)) :
+            '';
+        $stmt = $this->adapter->prepare(sprintf(
+            "SELECT * FROM %s WHERE %s %s",
+            $this->table,
+            $where,
+            $options
+        ));
+        $bindings = [];
+        if (is_object($where)) {
+            $bindings = array_merge($bindings, $where->getBindings());
         }
-        $id = $this->id;
-        return parent::__invoke($__viewdata + compact('medias', 'id'));
+        if (is_object($options)) {
+            $bindings = array_merge($bindings, $options->getBindings());
+        }
+        try {
+            $stmt->execute($bindings);
+            $__viewdata += $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+        }
+        return parent::__invoke($__viewdata);
     }
 }
 
