@@ -4,8 +4,44 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9439af1e5c89b2bd2c6d9553020e9018",
+    "hash": "676813bbe22b02048765176c06371fed",
     "packages": [
+        {
+            "name": "jakeasmith/http_build_url",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jakeasmith/http_build_url.git",
+                "reference": "15bdd686e5178ddfa3e88de60fa585adffb292bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jakeasmith/http_build_url/zipball/15bdd686e5178ddfa3e88de60fa585adffb292bb",
+                "reference": "15bdd686e5178ddfa3e88de60fa585adffb292bb",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/http_build_url.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jake A. Smith",
+                    "email": "theman@jakeasmith.com"
+                }
+            ],
+            "description": "Provides functionality for http_build_url() to environments without pecl_http.",
+            "time": "2015-05-06 12:27:20"
+        },
         {
             "name": "monomelodies/dabble",
             "version": "1.2.1",
@@ -52,50 +88,6 @@
             "time": "2015-06-19 11:58:53"
         },
         {
-            "name": "monomelodies/disclosure",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/monomelodies/disclosure.git",
-                "reference": "1e1cbf319b0d7574c083d7e634e2ffd9e88d15da"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/monomelodies/disclosure/zipball/1e1cbf319b0d7574c083d7e634e2ffd9e88d15da",
-                "reference": "1e1cbf319b0d7574c083d7e634e2ffd9e88d15da",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": ">=4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Disclosure\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marijn Ophorst",
-                    "email": "marijn@monomelodies.nl"
-                }
-            ],
-            "description": "PHP5 dependency injection framework",
-            "keywords": [
-                "dependency",
-                "injection",
-                "php"
-            ],
-            "time": "2015-06-04 13:45:37"
-        },
-        {
             "name": "monomelodies/improse",
             "version": "0.3.0",
             "source": {
@@ -136,6 +128,50 @@
                 "view"
             ],
             "time": "2015-06-06 07:12:58"
+        },
+        {
+            "name": "monomelodies/reroute",
+            "version": "1.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/monomelodies/reroute.git",
+                "reference": "a93de600df0df08580d12d2b788e62d615faa763"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/monomelodies/reroute/zipball/a93de600df0df08580d12d2b788e62d615faa763",
+                "reference": "a93de600df0df08580d12d2b788e62d615faa763",
+                "shasum": ""
+            },
+            "require": {
+                "jakeasmith/http_build_url": "^1.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Reroute\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marijn Ophorst",
+                    "email": "marijn@monomelodies.nl"
+                }
+            ],
+            "description": "Extremely flexible PHP5 router",
+            "keywords": [
+                "mvc",
+                "php",
+                "router"
+            ],
+            "time": "2015-06-22 15:22:09"
         }
     ],
     "packages-dev": [
