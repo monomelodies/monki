@@ -17,13 +17,19 @@ class Api
         $this->router = $router;
     }
 
-    public function browse($regex)
+    public function browse($regex, callable $validate = null)
     {
-        $this->router->group('monki', function () use ($regex) {
+        $this->router->group('monki', function () use ($regex, $validate) {
             $this->router->state(
                 'monki-browse',
                 new Regex($regex, ['GET', 'POST']),
-                function ($table, $VERB) {
+                function ($table, $VERB) use ($validate) {
+                    if (isset($validate)
+                        && !call_user_func($validate, $table, $VERB)
+                    ) {
+                        header("HTTP/1.1 403 Access denied", true);
+                        return;
+                    }
                     if ($VERB == 'POST') {
                         $controller = new Endpoint\Item\Controller($this->adapter);
                         if (!isset($_POST['action'])) {
@@ -46,26 +52,38 @@ class Api
         });
     }
 
-    public function count($regex)
+    public function count($regex, callable $validate = null)
     {
-        $this->router->group('monki', function () use ($regex) {
+        $this->router->group('monki', function () use ($regex, $validate) {
             $this->router->state(
                 'monki-count',
                 new Regex($regex),
-                function ($table) {
+                function ($table) use ($validate) {
+                    if (isset($validate)
+                        && !call_user_func($validate, $table)
+                    ) {
+                        header("HTTP/1.1 403 Access denied", true);
+                        return;
+                    }
                     return new Endpoint\Item\Cnt($this->adapter, $table);
                 }
             );
         });
     }
 
-    public function item($regex)
+    public function item($regex, callable $validate = null)
     {
-        $this->router->group('monki', function () use ($regex) {
+        $this->router->group('monki', function () use ($regex, $validate) {
             $this->router->state(
                 'monki-item',
                 new Regex($regex, ['GET', 'POST']),
-                function ($table, $id, $VERB) {
+                function ($table, $id, $VERB) use ($validate) {
+                    if (isset($validate)
+                        && !call_user_func($validate, $table, $VERB)
+                    ) {
+                        header("HTTP/1.1 403 Access denied", true);
+                        return;
+                    }
                     if ($VERB == 'POST') {
                         $controller = new Endpoint\Item\Controller($this->adapter);
                         if (!isset($_POST['action'])) {
