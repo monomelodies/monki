@@ -1,21 +1,16 @@
 # Monki
-
 Tools to easily bootstrap and generate APIs.
 
 ## Installation
 
 ### Composer (recommended)
 
-Add the dependency to your `composer.json` dependencies and update:
+```composer require monomelodies/monki````
 
-    {
-        "require": {
-            "monomelodies/monki": ">=0.0.1"
-        }
-    }
+### Manual
+Download or clone the repo, and add `/path/to/monki/src` to your autoloader.
 
 ## What is it?
-
 Monki is a set of tools to quickly and generically generate an API setup for
 project. Providing an API is becoming more and more important for several
 reasons:
