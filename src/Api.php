@@ -109,7 +109,6 @@ class Api
                     'monki-item',
                     new Regex($regex, ['GET', 'POST']),
                     function ($table, $id, $VERB) use ($validate, $ctrl) {
-                        $where = new Where(compact('id'));
                         $stmt = $this->adapter->prepare(sprintf(
                             "SELECT * FROM %s WHERE id = ?",
                             $table
