@@ -68,7 +68,9 @@ class Api
                                 $_POST['action'] = 'create';
                             }
                             if (method_exists($controller, $_POST['action'])) {
-                                $controller->{$_POST['action']}($_POST['data']);
+                                $id = $controller->{$_POST['action']}(
+                                    isset($_POST['data']) ? $_POST['data'] : []
+                                );
                             }
                             if ($_POST['action'] == 'create') {
                                 $stmt = $this->adapter->prepare(sprintf(
@@ -76,9 +78,7 @@ class Api
                                     $table
                                 ));
                                 try {
-                                    $stmt->execute([
-                                        $this->adapter->lastInsertId(),
-                                    ]);
+                                    $stmt->execute([$id]);
                                     $item = $stmt->fetch(PDO::FETCH_ASSOC);
                                     return new Endpoint\Item\View($item);
                                 } catch (PDOException $e) {
