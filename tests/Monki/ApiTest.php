@@ -38,6 +38,7 @@ class MonkiApiTest extends AbstractTest
         $db = $this->getConnection()->getConnection();
         $router = new Reroute\Router;
         $api = new Monki\Api($db, $router);
+        $api->count("/(?'table'foo)/count/");
         $api->item("/(?'table'foo)/(?'id'\d+)/");
         $state = $router->resolve('/foo/1/');
         $found = json_decode($state->run(), true);
@@ -46,6 +47,12 @@ class MonkiApiTest extends AbstractTest
         $state = $router->resolve('/foo/1/', 'POST');
         $found = json_decode($state->run(), true);
         $this->assertEquals('boo', $found['content']);
+        $_POST = ['action' => 'delete'];
+        $state = $router->resolve('/foo/1/', 'POST');
+        $state->run();
+        $state = $router->resolve('/foo/count/');
+        $found = json_decode($state->run(), true);
+        $this->assertEquals(3, $found['count']);
     }
 }
 
