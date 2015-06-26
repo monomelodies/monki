@@ -15,7 +15,7 @@ class View extends Json
 
     public function __invoke(array $__viewdata = [])
     {
-        return parent::__invoke($this->item);
+        return parent::__invoke($this->item ? $this->item : []);
     }
 }
 
