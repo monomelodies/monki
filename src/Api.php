@@ -70,11 +70,19 @@ class Api
                                 $controller->{$_POST['action']}($_POST['data']);
                             }
                             if ($_POST['action'] == 'create') {
-                                return new Endpoint\Item\View(
-                                    $this->adapter,
-                                    $table,
-                                    $this->adapter->lastInsertId()
-                                );
+                                $stmt = $this->adapter->prepare(sprintf(
+                                    "SELECT * FROM %s WHERE id = ?",
+                                    $table
+                                ));
+                                try {
+                                    $stmt->execute([
+                                        $this->adapter->lastInsertId(),
+                                    ]);
+                                    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    return new Endpoint\Item\View($item);
+                                } catch (PDOException $e) {
+                                    return $this->error(500);
+                                }
                             }
                         }
                         return new Endpoint\Browse\View($this->adapter, $table);
