@@ -42,6 +42,10 @@ class MonkiApiTest extends AbstractTest
         $state = $router->resolve('/foo/1/');
         $found = json_decode($state->run(), true);
         $this->assertEquals('bar', $found['content']);
+        $_POST = ['action' => 'update', 'data' => ['content' => 'boo']];
+        $state = $router->resolve('/foo/1/', 'POST');
+        $found = json_decode($state->run(), true);
+        $this->assertEquals('boo', $found['content']);
     }
 }
 
