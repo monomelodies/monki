@@ -28,6 +28,7 @@ class Api
     private function error($code)
     {
         header("HTTP/1.1 $code {$this->status[$code]}", true, $code);
+        header("Content-type: text/html", true);
     }
 
     private function valid($validate, $table, $VERB)
