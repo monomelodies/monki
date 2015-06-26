@@ -1,5 +1,5 @@
 # Monki
-Tool to easily bootstrap and generate APIs.
+Simple API bootstrapper.
 
 Monki is a library that allows you to quickly add a basic API to your project.
 Providing an API is becoming more and more important for several reasons:

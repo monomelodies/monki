@@ -8,10 +8,14 @@ use PDOException;
 class Controller
 {
     protected $adapter;
+    protected $table;
+    protected $item;
 
-    public function __construct(PDO $adapter)
+    public function __construct(PDO $adapter, $table, $item = null)
     {
         $this->adapter = $adapter;
+        $this->table = $table;
+        $this->item = $item;
     }
 
     private function normalize($value)
@@ -28,9 +32,9 @@ class Controller
         return $value;
     }
 
-    public function create($table)
+    public function create(array $data)
     {
-        $data = array_map([$this, 'normalize'], $_POST['data']);
+        $data = array_map([$this, 'normalize'], $data);
         unset($data['id']); // never when creating...
         foreach ($data as $key => &$item) {
             if (is_array($item)) {
@@ -44,7 +48,7 @@ class Controller
         try {
             $stmt = $this->adapter->prepare(sprintf(
                 "INSERT INTO %s (%s) VALUES (%s)",
-                $table,
+                $this->table,
                 implode(', ', array_keys($data)),
                 implode(', ', array_fill(0, count($data), '?'))
             ));
@@ -55,9 +59,9 @@ class Controller
         }
     }
 
-    public function update($table, $id)
+    public function update(array $data)
     {
-        $data = array_map([$this, 'normalize'], $_POST['data']);
+        $data = array_map([$this, 'normalize'], $data);
         $fields = [];
         foreach ($data as $name => $value) {
             $fields[] = sprintf('%s = ?', $name);
@@ -65,32 +69,31 @@ class Controller
         try {
             $stmt = $this->adapter->prepare(sprintf(
                 "UPDATE %s SET %s WHERE id = ?",
-                $table,
+                $this->table,
                 implode(', ', $fields)
             ));
-            $stmt->execute(array_merge(array_values($data), [$id]));
+            $stmt->execute(array_merge(
+                array_values($data),
+                [$this->item['id']]
+            ));
             return $stmt->rowCount();
         } catch (PDOException $e) {
             return 0;
         }
     }
 
-    public function delete($table, $id)
+    public function delete()
     {
+        if (!isset($this->item)) {
+            return 0;
+        }
         try {
             $stmt = $this->adapter->prepare(sprintf(
-                "SELECT 1 FROM %s WHERE id = ?",
-                $table
+                "DELETE FROM %s WHERE id = ?",
+                $this->table
             ));
-            $stmt->execute([$id]);
-            if (false !== $stmt->fetchColumn()) {
-                $stmt = $this->adapter->prepare(sprintf(
-                    "DELETE FROM %s WHERE id = ?",
-                    $table
-                ));
-                $stmt->execute([$id]);
-                return $stmt->rowCount();
-            }
+            $stmt->execute([$this->item['id']]);
+            return $stmt->rowCount();
         } catch (PDOException $e) {
             return 0;
         }

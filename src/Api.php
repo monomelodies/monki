@@ -3,6 +3,7 @@
 namespace Monki;
 
 use PDO;
+use PDOException;
 use Reroute\Router;
 use Reroute\Url\Regex;
 
@@ -10,6 +11,13 @@ class Api
 {
     protected $adapter;
     protected $router;
+    protected $status = [
+        401 => 'Unauthorized',
+        403 => 'Forbidden',
+        404 => 'Not found',
+        405 => 'Method not allowed',
+        500 => 'Internal server error',
+    ];
 
     public function __construct(PDO $adapter, Router $router)
     {
@@ -17,68 +25,146 @@ class Api
         $this->router = $router;
     }
 
-    public function browse($regex)
+    private function error($code)
     {
-        $this->router->group('monki', function () use ($regex) {
-            $this->router->state(
-                'monki-browse',
-                new Regex($regex, ['GET', 'POST']),
-                function ($table, $VERB) {
-                    if ($VERB == 'POST') {
-                        $controller = new Endpoint\Item\Controller($this->adapter);
-                        if (!isset($_POST['action'])) {
-                            $_POST['action'] = 'create';
-                        }
-                        if (method_exists($controller, $_POST['action'])) {
-                            $controller->{$_POST['action']}($table);
-                        }
-                        if ($_POST['action'] == 'create') {
-                            return new Endpoint\Item\View(
-                                $this->adapter,
-                                $table,
-                                $this->adapter->lastInsertId()
-                            );
-                        }
-                    }
-                    return new Endpoint\Browse\View($this->adapter, $table);
-                }
-            );
-        });
+        header("HTTP/1.1 $code {$this->status[$code]}", true, $code);
     }
 
-    public function count($regex)
+    private function valid($validate, $table, $VERB)
     {
-        $this->router->group('monki', function () use ($regex) {
+        if (isset($validate)) {
+            if (is_callable($validate)) {
+                if ($error = call_user_func($validate, $table, $VERB)) {
+                    $this->error($error);
+                    return false;
+                }
+            } else {
+                $this->error(500);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function browse($regex, $validate = null, $ctrl = null)
+    {
+        $this->router->group(
+            'monki',
+            function () use ($regex, $validate, $ctrl) {
+                $this->router->state(
+                    'monki-browse',
+                    new Regex($regex, ['GET', 'POST']),
+                    function ($table, $VERB) use ($validate, $ctrl) {
+                        if (!$this->valid($validate, $table, $VERB)) {
+                            return;
+                        }
+                        if ($VERB == 'POST') {
+                            if (!isset($ctrl)) {
+                                $ctrl = 'Monki\Endpoint\Item\Controller';
+                            }
+                            $controller = new $ctrl($this->adapter, $table);
+                            if (!isset($_POST['action'])) {
+                                $_POST['action'] = 'create';
+                            }
+                            if (method_exists($controller, $_POST['action'])) {
+                                $controller->{$_POST['action']}($_POST['data']);
+                            }
+                            if ($_POST['action'] == 'create') {
+                                $stmt = $this->adapter->prepare(sprintf(
+                                    "SELECT * FROM %s WHERE id = ?",
+                                    $table
+                                ));
+                                try {
+                                    $stmt->execute([
+                                        $this->adapter->lastInsertId(),
+                                    ]);
+                                    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    return new Endpoint\Item\View($item);
+                                } catch (PDOException $e) {
+                                    return $this->error(500);
+                                }
+                            }
+                        }
+                        return new Endpoint\Browse\View($this->adapter, $table);
+                    }
+                );
+            }
+        );
+    }
+
+    public function count($regex, $validate = null)
+    {
+        $this->router->group('monki', function () use ($regex, $validate) {
             $this->router->state(
                 'monki-count',
                 new Regex($regex),
-                function ($table) {
+                function ($table) use ($validate) {
+                    if (!$this->valid($validate, $table, 'GET')) {
+                        return;
+                    }
                     return new Endpoint\Item\Cnt($this->adapter, $table);
                 }
             );
         });
     }
 
-    public function item($regex)
+    public function item($regex, callable $validate = null, $ctrl = null)
     {
-        $this->router->group('monki', function () use ($regex) {
-            $this->router->state(
-                'monki-item',
-                new Regex($regex, ['GET', 'POST']),
-                function ($table, $id, $VERB) {
-                    if ($VERB == 'POST') {
-                        $controller = new Endpoint\Item\Controller($this->adapter);
-                        if (!isset($_POST['action'])) {
-                            $_POST['action'] = 'update';
+        $this->router->group(
+            'monki',
+            function () use ($regex, $validate, $ctrl) {
+                $this->router->state(
+                    'monki-item',
+                    new Regex($regex, ['GET', 'POST']),
+                    function ($table, $id, $VERB) use ($validate, $ctrl) {
+                        $stmt = $this->adapter->prepare(sprintf(
+                            "SELECT * FROM %s WHERE id = ?",
+                            $table
+                        ));
+                        try {
+                            $stmt->execute([$id]);
+                            $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                        } catch (PDOException $e) {
                         }
-                        if (method_exists($controller, $_POST['action'])) {
-                            $controller->{$_POST['action']}($table, $id);
+                        if (!$this->valid($validate, $table, $item, $VERB)) {
+                            return;
                         }
+                        if (!$item) {
+                            $this->error(404);
+                            return;
+                        }
+                        if ($VERB == 'POST') {
+                            if (!isset($ctrl)) {
+                                $ctrl = 'Monki\Endpoint\Item\Controller';
+                            }
+                            $controller = new $ctrl(
+                                $this->adapter,
+                                $table,
+                                $item
+                            );
+                            if (!isset($_POST['action'])) {
+                                $_POST['action'] = 'update';
+                            }
+                            if (method_exists($controller, $_POST['action'])) {
+                                $controller->{$_POST['action']}(
+                                    isset($_POST['data']) ? $_POST['data'] : null
+                                );
+                                $stmt->execute([$id]);
+                                $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                            } else {
+                                header(
+                                    "HTTP/1.1 405 {$this->status[405]}",
+                                    true,
+                                    405
+                                );
+                                return;
+                            }
+                        }
+                        return new Endpoint\Item\View($item);
                     }
-                    return new Endpoint\Item\View($this->adapter, $table, $id);
-                }
-            );
-        });
+                );
+            }
+        );
     }
 }
 
