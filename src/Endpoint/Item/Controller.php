@@ -53,7 +53,7 @@ class Controller
                 implode(', ', array_fill(0, count($data), '?'))
             ));
             $stmt->execute(array_values($data));
-            return $stmt->rowCount();
+            return $this->adapter->lastInsertId();
         } catch (PDOException $e) {
             return 0;
         }
