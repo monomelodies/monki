@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<dataset>
+    <table name="foo">
+        <column>id</column>
+        <column>content</column>
+        <row>
+            <value>1</value>
+            <value>bar</value>
+        </row>
+        <row>
+            <value>2</value>
+            <value>baz</value>
+        </row>
+        <row>
+            <value>3</value>
+            <value>fizz</value>
+        </row>
+        <row>
+            <value>4</value>
+            <value>buzz</value>
+        </row>
+    </table>
+</dataset>
