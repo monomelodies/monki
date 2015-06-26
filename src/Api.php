@@ -141,6 +141,8 @@ class Api
                                 $controller->{$_POST['action']}(
                                     isset($_POST['data']) ? $_POST['data'] : null
                                 );
+                                $stmt->execute([$id]);
+                                $item = $stmt->fetch(PDO::FETCH_ASSOC);
                             } else {
                                 header(
                                     "HTTP/1.1 405 {$this->status[405]}",
