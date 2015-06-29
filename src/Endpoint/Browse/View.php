@@ -25,7 +25,7 @@ class View extends Json
             new Where(json_decode($_GET['filter'], true)) :
             '1=1';
         $options = isset($_GET['options']) ?
-            new Options(json_decode($_GET['filter'], true)) :
+            new Options(json_decode($_GET['options'], true)) :
             '';
         $stmt = $this->adapter->prepare(sprintf(
             "SELECT * FROM %s WHERE %s %s",
