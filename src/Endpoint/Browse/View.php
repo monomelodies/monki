@@ -5,6 +5,7 @@ namespace Monki\Endpoint\Browse;
 use Improse\Json;
 use Dabble\Query\Where;
 use Dabble\Query\Options;
+use Dabble\Query\Raw;
 use PDO;
 use PDOException;
 
@@ -22,7 +23,7 @@ class View extends Json
     public function __invoke(array $__viewdata = [])
     {
         $where = isset($_GET['filter']) ?
-            new Where(json_decode($_GET['filter'], true)) :
+            new Where($this->filter($_GET['filter'])) :
             '1=1';
         $options = isset($_GET['options']) ?
             new Options(json_decode($_GET['options'], true)) :
@@ -46,6 +47,26 @@ class View extends Json
         } catch (PDOException $e) {
         }
         return parent::__invoke($__viewdata);
+    }
+
+    protected function filter($f)
+    {
+        $f = json_decode($f, true);
+        
+        $walker = function ($arr) use (&$walker) {
+            foreach ($arr as $key => &$value) {
+                if (is_array($value)) {
+                    if (isset($value['raw'])) {
+                        $value = new Raw($value['raw']);
+                    } else {
+                        $value = $walker($value);
+                    }
+                }
+            }
+            return $arr;
+        };
+        
+        return $walker($f);
     }
 }
 
