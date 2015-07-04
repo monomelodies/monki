@@ -14,7 +14,7 @@ $api->browse("/(?'table'foo)/", function () {
     return null;
 });
 // bar is never allowed:
-$api->browse("/(?'table'bar)/", function() {
+$api->browse("/(?'table'bar)/", function () {
     return 403;
 });
 
