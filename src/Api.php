@@ -7,6 +7,23 @@ use PDOException;
 use Reroute\Router;
 use Reroute\Url\Regex;
 
+$recurse = function (array &$data) use (&$recurse) {
+    foreach ($data as &$value) {
+        if (is_array($value)) {
+            $recurse($value);
+        } else {
+            if (preg_match('@^\$\((\w+)\)$@', $value, $fn)) {
+                $fn = $fn[1];
+                if (function_exists($fn)) {
+                    $value = $fn();
+                }
+            }
+        }
+    }
+};
+
+$recurse($_POST);
+
 class Api
 {
     protected $adapter;
@@ -73,6 +90,9 @@ class Api
                                 );
                             }
                             if ($_POST['action'] == 'create') {
+                                if ($id == 0) {
+                                    return json_encode(new \StdClass);
+                                }
                                 $stmt = $this->adapter->prepare(sprintf(
                                     "SELECT * FROM %s WHERE id = ?",
                                     $table
