@@ -14,7 +14,7 @@ $api->browse("/(?'table'foo)/", function () {
     return null;
 });
 // bar is never allowed:
-$api->browse("/(?'table'bar)/", function() {
+$api->browse("/(?'table'bar)/", function () {
     return 403;
 });
 
@@ -106,4 +106,30 @@ $router->host('https://api.example.com', function ($router) {
 For table `foo`, the "browse" route would now be
 `https://api.example.com/1.1/foo/`. [See the full Reroute documentation for
 more info on its various options.](http://reroute.monomelodies.nl/docs/)
+
+## Passing parameters to API calls
+Internally, Monki uses the [Dabble database abstraction](http://dabble.monomelodies.nl).
+This means that you can pass filters (`WHERE` clauses) and options (`LIMIT`,
+`OFFSET` etc.) as JSON-encoded `$_GET` parameters.
+
+Passing `filter` and/or `browse` is mostly useful when doing `browse` and
+`count` API queries. For single items, they rarely make sense.
+
+## Passing raw values in filters or options
+Dabble offers a `Dabble\Query\Raw` object that tells the query builder to
+treat it contents verbatim (i.e., do no quoting/escaping).
+
+To pass a raw value in a JSON object - which by definition has no knowledge of
+classnames - use an array or object with a single key (`raw`) and the value:
+
+```php
+$filter = json_encode([
+    'datevalid' => ['<=' => ['raw': 'NOW()']]
+]);
+```
+
+Or, in Javascript:
+```javascript
+let filter = JSON.stringify({datevalid: {'<=': {raw: 'NOW()'}}});
+```
 
