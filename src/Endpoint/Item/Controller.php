@@ -4,6 +4,7 @@ namespace Monki\Endpoint\Item;
 
 use PDO;
 use PDOException;
+use Dabble\Query\Where;
 
 class Controller
 {
@@ -57,6 +58,31 @@ class Controller
         } catch (PDOException $e) {
             return 0;
         }
+    }
+
+    public function replace(array $data)
+    {
+        $data = array_map([$this, 'normalize'], $data);
+        foreach ($data as $key => &$item) {
+            if (is_array($item)) {
+                if (isset($item['id'])) {
+                    $item = $item['id'];
+                } else {
+                    unset($data[$key]);
+                }
+            }
+        }
+        $where = new Where($data);
+        try {
+            $stmt = $this->adapter->prepare(sprintf(
+                "DELETE FROM %s WHERE %s",
+                $this->table,
+                $where
+            ));
+            $stmt->execute($where->getBindings());
+        } catch (PDOException $e) {
+        }
+        return $this->create($data);
     }
 
     public function update(array $data)
