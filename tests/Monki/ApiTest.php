@@ -11,13 +11,13 @@ class MonkiApiTest extends AbstractTest
         $db = $this->getConnection()->getConnection();
         $router = new Reroute\Router;
         $api = new Monki\Api($db, $router);
-        $api->browse("/(?'table'foo)/");
+        $api->browse();
         $state = $router->resolve('/foo/');
-        $found = json_decode($state->run(), true);
+        $found = json_decode("$state", true);
         $this->assertEquals(4, count($found));
         $_POST = ['action' => 'create', 'data' => ['content' => 'whee']];
         $state = $router->resolve('/foo/', 'POST');
-        $found = json_decode($state->run(), true);
+        $found = json_decode("$state", true);
         $this->assertEquals('whee', $found['content']);
     }
 
@@ -29,9 +29,9 @@ class MonkiApiTest extends AbstractTest
         $db = $this->getConnection()->getConnection();
         $router = new Reroute\Router;
         $api = new Monki\Api($db, $router);
-        $api->count("/(?'table'foo)/count/");
+        $api->count();
         $state = $router->resolve('/foo/count/');
-        $found = json_decode($state->run(), true);
+        $found = json_decode("$state", true);
         $this->assertEquals(4, $found['count']);
     }
 
@@ -45,20 +45,20 @@ class MonkiApiTest extends AbstractTest
         $db = $this->getConnection()->getConnection();
         $router = new Reroute\Router;
         $api = new Monki\Api($db, $router);
-        $api->count("/(?'table'foo)/count/");
-        $api->item("/(?'table'foo)/(?'id'\d+)/");
+        $api->count();
+        $api->item();
         $state = $router->resolve('/foo/1/');
-        $found = json_decode($state->run(), true);
+        $found = json_decode("$state", true);
         $this->assertEquals('bar', $found['content']);
         $_POST = ['action' => 'update', 'data' => ['content' => 'boo']];
         $state = $router->resolve('/foo/1/', 'POST');
-        $found = json_decode($state->run(), true);
+        $found = json_decode("$state", true);
         $this->assertEquals('boo', $found['content']);
         $_POST = ['action' => 'delete'];
         $state = $router->resolve('/foo/1/', 'POST');
         $state->run();
         $state = $router->resolve('/foo/count/');
-        $found = json_decode($state->run(), true);
+        $found = json_decode("$state", true);
         $this->assertEquals(3, $found['count']);
     }
 }
