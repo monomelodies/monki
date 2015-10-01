@@ -26,7 +26,7 @@
         "ext-spl": "*",
         "monomelodies/dabble": "^1.2",
         "monomelodies/improse": "^0.3.0",
-        "monomelodies/reroute": "^1.1"
+        "monomelodies/reroute": "^2.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.0.0",
