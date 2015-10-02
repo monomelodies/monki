@@ -49,35 +49,43 @@ class Api
         $this->router
              ->when("/(?'table'\w+)/", $validate)
              ->then('monki-browse', function ($table, $VERB) {
-                if ($VERB == 'POST') {
-                    $controller = new Item\Controller($this->adapter, $table);
-                    if (!isset($_POST['action'])) {
-                        $_POST['action'] = 'create';
-                    }
-                    if (method_exists($controller, $_POST['action'])) {
-                        $id = $controller->{$_POST['action']}(
-                            isset($_POST['data']) ? $_POST['data'] : []
-                        );
-                    }
-                    if ($_POST['action'] == 'create') {
-                        if ($id == 0) {
-                            return json_encode(new \StdClass);
-                        }
-                        $stmt = $this->adapter->prepare(sprintf(
-                            "SELECT * FROM %s WHERE id = ?",
-                            $table
-                        ));
-                        try {
-                            $stmt->execute([$id]);
-                            $item = $stmt->fetch(PDO::FETCH_ASSOC);
-                            return new Item\View($item);
-                        } catch (PDOException $e) {
-                            return $this->error(500);
-                        }
-                    }
-                }
-                return new Browse\View($this->adapter, $table);
+                return $this->handle(
+                    new Item\Controller($this->adapter, $table),
+                    $table,
+                    $VERB
+                );
              });
+    }
+
+    public function handle($controller, $table, $verb)
+    {
+        if ($verb == 'POST') {
+            if (!isset($_POST['action'])) {
+                $_POST['action'] = 'create';
+            }
+            if (method_exists($controller, $_POST['action'])) {
+                $id = $controller->{$_POST['action']}(
+                    isset($_POST['data']) ? $_POST['data'] : []
+                );
+            }
+            if ($_POST['action'] == 'create') {
+                if ($id == 0) {
+                    return json_encode(new \StdClass);
+                }
+                $stmt = $this->adapter->prepare(sprintf(
+                    "SELECT * FROM %s WHERE id = ?",
+                    $table
+                ));
+                try {
+                    $stmt->execute([$id]);
+                    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                    return new Item\View($item);
+                } catch (PDOException $e) {
+                    return $this->error(500);
+                }
+            }
+        }
+        return new Browse\View($this->adapter, $table);
     }
 
     public function count(callable $validate = null)
