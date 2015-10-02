@@ -44,10 +44,10 @@ class Api
         $this->router = $router;
     }
 
-    public function browse(callable $validate = null, $ctrl = null)
+    public function browse(callable $validate = null)
     {
         $this->router
-             ->when("/(?'table'media)/", $validate)
+             ->when("/(?'table'\w+)/", $validate)
              ->then('monki-browse', function ($table, $VERB) {
                 if ($VERB == 'POST') {
                     $controller = new Item\Controller($this->adapter, $table);
