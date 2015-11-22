@@ -27,6 +27,9 @@ class Controller
         if (!is_scalar($value)) {
             return $value;
         }
+        if (is_numeric($value)) {
+            return $value;
+        }
         if (false !== ($time = strtotime($value))) {
             return date('Y-m-d H:i:s', $time);
         }
