@@ -30,6 +30,9 @@ class Controller
         if (is_numeric($value)) {
             return $value;
         }
+        if (is_null($value) || !strlen($value)) {
+            return null;
+        }
         if (false !== ($time = strtotime($value))) {
             return date('Y-m-d H:i:s', $time);
         }
