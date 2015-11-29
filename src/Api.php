@@ -8,6 +8,7 @@ use Reroute\Router;
 use Monki\Endpoint\Item;
 use Monki\Endpoint\Browse;
 use Psr\Http\Message\RequestInterface;
+use Zend\Diactoros\Response\HtmlResponse;
 
 $recurse = function (array &$data) use (&$recurse) {
     foreach ($data as &$value) {
@@ -66,7 +67,8 @@ class Api
                 try {
                     $stmt->execute([$id]);
                     $item = $stmt->fetch(PDO::FETCH_ASSOC);
-                    return new Item\View($item);
+                    return (new HtmlResponse(json_encode($item)))
+                        ->withHeader('Content-Type', 'application/json');
                 } catch (PDOException $e) {
                     return $this->error(500);
                 }
@@ -77,8 +79,10 @@ class Api
 
     public function browse(callable $validate = null)
     {
+        $validate = $this->validate($validate);
         $this->router
-             ->when("/(?'table'\w+)/", $validate)
+             ->when("/(?'table'\w+)/")
+             ->pipe($validate)
              ->then(
                 'monki-browse',
                 function ($table, RequestInterface $request) {
@@ -92,8 +96,10 @@ class Api
 
     public function count(callable $validate = null)
     {
+        $validate = $this->validate($validate);
         $this->router
-             ->when("/(?'table'\w+)/count/", $validate)
+             ->when("/(?'table'\w+)/count/")
+             ->pipe($validate)
              ->then('monki-count', function ($table) {
                 return new Item\Cnt($this->adapter, $table);
              });
@@ -101,8 +107,10 @@ class Api
 
     public function item(callable $validate = null)
     {
+        $validate = $this->validate($validate);
         $this->router
-             ->when("/(?'table'\w+)/(?'id'\d+)/", $validate)
+             ->when("/(?'table'\w+)/(?'id'\d+)/")
+             ->pipe($validate)
              ->then(
                 'monki-item',
                 function ($table, $id, RequestInterface $request) {
@@ -141,9 +149,18 @@ class Api
                             return;
                         }
                     }
-                    return new Item\View($item);
+                    return (new HtmlResponse(json_encode($item)))
+                        ->withHeader('Content-type', 'application/json');
                  }
             );
+    }
+
+    protected function validate(callable $validate = null)
+    {
+        if (!isset($validate)) {
+            $validate = function ($payload) { return $payload; };
+        }
+        return new Stage($validate);
     }
 }
 
