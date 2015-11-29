@@ -2,9 +2,9 @@
 
 namespace Monki\Endpoint\Item;
 
-use Improse\Json;
+use Zend\Diactoros\Response\HtmlResponse;
 
-class View extends Json
+class View
 {
     protected $item;
 
@@ -13,9 +13,10 @@ class View extends Json
         $this->item = $item;
     }
 
-    public function __invoke(array $__viewdata = [])
+    public function __invoke()
     {
-        return parent::__invoke($this->item ? $this->item : []);
+        return (new HtmlResponse(json_encode($this->item)))
+            ->withHeader('Content-Type', 'application/json');
     }
 }
 
