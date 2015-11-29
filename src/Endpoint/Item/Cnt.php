@@ -2,12 +2,13 @@
 
 namespace Monki\Endpoint\Item;
 
-use Improse\Json;
 use PDO;
 use PDOException;
 use Dabble\Query\Where;
+use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\EmptyResponse;
 
-class Cnt extends Json
+class Cnt
 {
     protected $adapter;
     protected $table;
@@ -18,7 +19,7 @@ class Cnt extends Json
         $this->table = $table;
     }
 
-    public function __invoke(array $__viewdata = [])
+    public function __invoke()
     {
         $where = isset($_GET['filter']) ?
             new Where(json_decode($_GET['filter'], true)) :
@@ -31,8 +32,11 @@ class Cnt extends Json
         $bindings = is_object($where) ? $where->getBindings() : [];
         try {
             $stmt->execute($bindings);
-            $__viewdata += ['count' => $stmt->fetchColumn()];
+            $data = ['count' => $stmt->fetchColumn()];
+            return (new HtmlResponse(json_encode($data)))
+                ->withHeader('Content-type', 'application/json');
         } catch (PDOException $e) {
+            return new EmptyResponse(500);
         }
         return parent::__invoke($__viewdata);
     }
