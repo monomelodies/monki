@@ -2,14 +2,15 @@
 
 namespace Monki\Endpoint\Browse;
 
-use Improse\Json;
 use Dabble\Query\Where;
 use Dabble\Query\Options;
 use Dabble\Query\Raw;
 use PDO;
 use PDOException;
+use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\EmptyResponse;
 
-class View extends Json
+class View
 {
     protected $adapter;
     protected $table;
@@ -20,7 +21,7 @@ class View extends Json
         $this->table = $table;
     }
 
-    public function __invoke(array $__viewdata = [])
+    public function __invoke()
     {
         $where = isset($_GET['filter']) ?
             new Where($this->filter($_GET['filter'])) :
@@ -43,10 +44,13 @@ class View extends Json
         }
         try {
             $stmt->execute($bindings);
-            $__viewdata += $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $out = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $response = (new HtmlResponse(json_encode($out), 200))
+                ->withHeader('Content-type', 'application/json');
+            return $response;
         } catch (PDOException $e) {
+            return new EmptyResponse(500);
         }
-        return parent::__invoke($__viewdata);
     }
 
     protected function filter($f)
