@@ -5,9 +5,9 @@ namespace Monki;
 use PDO;
 use PDOException;
 use Reroute\Router;
-use Reroute\Url\Regex;
 use Monki\Endpoint\Item;
 use Monki\Endpoint\Browse;
+use Psr\Http\Message\RequestInterface;
 
 $recurse = function (array &$data) use (&$recurse) {
     foreach ($data as &$value) {
@@ -44,19 +44,6 @@ class Api
         $this->router = $router;
     }
 
-    public function browse(callable $validate = null)
-    {
-        $this->router
-             ->when("/(?'table'\w+)/", $validate)
-             ->then('monki-browse', function ($table, $VERB) {
-                return $this->handle(
-                    new Item\Controller($this->adapter, $table),
-                    $table,
-                    $VERB
-                );
-             });
-    }
-
     public function handle($controller, $table, $verb)
     {
         if ($verb == 'POST') {
@@ -88,6 +75,21 @@ class Api
         return new Browse\View($this->adapter, $table);
     }
 
+    public function browse(callable $validate = null)
+    {
+        $this->router
+             ->when("/(?'table'\w+)/", $validate)
+             ->then(
+                'monki-browse',
+                function ($table, RequestInterface $request) {
+                    return $this->handle(
+                        new Item\Controller($this->adapter, $table),
+                        $table,
+                        $request->getMethod()
+                    );
+                 });
+    }
+
     public function count(callable $validate = null)
     {
         $this->router
@@ -101,44 +103,47 @@ class Api
     {
         $this->router
              ->when("/(?'table'\w+)/(?'id'\d+)/", $validate)
-             ->then('monki-item', function ($table, $id, $VERB) {
-                $stmt = $this->adapter->prepare(sprintf(
-                    "SELECT * FROM %s WHERE id = ?",
-                    $table
-                ));
-                try {
-                    $stmt->execute([$id]);
-                    $item = $stmt->fetch(PDO::FETCH_ASSOC);
-                } catch (PDOException $e) {
-                    header("HTTP/1.1 404 Not found", true, 404);
-                    return;
-                }
-                if ($VERB == 'POST') {
-                    $controller = new Item\Controller(
-                        $this->adapter,
-                        $table,
-                        $item
-                    );
-                    if (!isset($_POST['action'])) {
-                        $_POST['action'] = 'update';
-                    }
-                    if (method_exists($controller, $_POST['action'])) {
-                        $controller->{$_POST['action']}(
-                            isset($_POST['data']) ? $_POST['data'] : null
-                        );
+             ->then(
+                'monki-item',
+                function ($table, $id, RequestInterface $request) {
+                    $stmt = $this->adapter->prepare(sprintf(
+                        "SELECT * FROM %s WHERE id = ?",
+                        $table
+                    ));
+                    try {
                         $stmt->execute([$id]);
                         $item = $stmt->fetch(PDO::FETCH_ASSOC);
-                    } else {
-                        header(
-                            "HTTP/1.1 405 {$this->status[405]}",
-                            true,
-                            405
-                        );
+                    } catch (PDOException $e) {
+                        header("HTTP/1.1 404 Not found", true, 404);
                         return;
                     }
-                }
-                return new Item\View($item);
-             });
+                    if ($request->getMethod() == 'POST') {
+                        $controller = new Item\Controller(
+                            $this->adapter,
+                            $table,
+                            $item
+                        );
+                        if (!isset($_POST['action'])) {
+                            $_POST['action'] = 'update';
+                        }
+                        if (method_exists($controller, $_POST['action'])) {
+                            $controller->{$_POST['action']}(
+                                isset($_POST['data']) ? $_POST['data'] : null
+                            );
+                            $stmt->execute([$id]);
+                            $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                        } else {
+                            header(
+                                "HTTP/1.1 405 {$this->status[405]}",
+                                true,
+                                405
+                            );
+                            return;
+                        }
+                    }
+                    return new Item\View($item);
+                 }
+            );
     }
 }
 
