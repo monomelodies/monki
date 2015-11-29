@@ -1,5 +1,8 @@
 <?php
 
+namespace Monki\Tests;
+
+use PHPUnit_Extensions_Database_TestCase;
 use Dabble\Adapter\Sqlite;
 use Disclosure\Container;
 use Reroute\State;
