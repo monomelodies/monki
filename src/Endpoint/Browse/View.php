@@ -7,7 +7,7 @@ use Dabble\Query\Options;
 use Dabble\Query\Raw;
 use PDO;
 use PDOException;
-use Zend\Diactoros\Response\HtmlResponse;
+use Monki\Response\JsonResponse;
 use Zend\Diactoros\Response\EmptyResponse;
 
 class View
@@ -45,9 +45,7 @@ class View
         try {
             $stmt->execute($bindings);
             $out = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $response = (new HtmlResponse(json_encode($out), 200))
-                ->withHeader('Content-type', 'application/json');
-            return $response;
+            return new JsonResponse($out);
         } catch (PDOException $e) {
             return new EmptyResponse(500);
         }
