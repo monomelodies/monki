@@ -5,7 +5,7 @@ namespace Monki\Endpoint\Item;
 use PDO;
 use PDOException;
 use Dabble\Query\Where;
-use Zend\Diactoros\Response\HtmlResponse;
+use Monki\Response\JsonResponse;
 use Zend\Diactoros\Response\EmptyResponse;
 
 class Cnt
@@ -33,12 +33,10 @@ class Cnt
         try {
             $stmt->execute($bindings);
             $data = ['count' => $stmt->fetchColumn()];
-            return (new HtmlResponse(json_encode($data)))
-                ->withHeader('Content-type', 'application/json');
+            return new JsonResponse($data);
         } catch (PDOException $e) {
             return new EmptyResponse(500);
         }
-        return parent::__invoke($__viewdata);
     }
 }
 
