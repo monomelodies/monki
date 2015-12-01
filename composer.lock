@@ -137,16 +137,16 @@
         },
         {
             "name": "monomelodies/reroute",
-            "version": "3.0.3",
+            "version": "3.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/monomelodies/reroute.git",
-                "reference": "c8f85d3041a2fafb67daa595806846db6c427574"
+                "reference": "620d0431d79eb140f775788bae06b875350baae1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/monomelodies/reroute/zipball/c8f85d3041a2fafb67daa595806846db6c427574",
-                "reference": "c8f85d3041a2fafb67daa595806846db6c427574",
+                "url": "https://api.github.com/repos/monomelodies/reroute/zipball/620d0431d79eb140f775788bae06b875350baae1",
+                "reference": "620d0431d79eb140f775788bae06b875350baae1",
                 "shasum": ""
             },
             "require": {
@@ -179,7 +179,7 @@
                 "php",
                 "router"
             ],
-            "time": "2015-11-29 16:35:10"
+            "time": "2015-12-01 08:43:57"
         },
         {
             "name": "psr/http-message",
@@ -746,16 +746,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.18",
+            "version": "4.8.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "fa33d4ad96481b91df343d83e8c8aabed6b1dfd3"
+                "reference": "b2caaf8947aba5e002d42126723e9d69795f32b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fa33d4ad96481b91df343d83e8c8aabed6b1dfd3",
-                "reference": "fa33d4ad96481b91df343d83e8c8aabed6b1dfd3",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b2caaf8947aba5e002d42126723e9d69795f32b4",
+                "reference": "b2caaf8947aba5e002d42126723e9d69795f32b4",
                 "shasum": ""
             },
             "require": {
@@ -814,7 +814,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-11-11 11:32:49"
+            "time": "2015-11-30 08:18:59"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1245,25 +1245,25 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.7.7",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "4cfcd7a9fceba662b3c036b7d9a91f6197af046c"
+                "reference": "177a015cb0e19ff4a49e0e2e2c5fc1c1bee07002"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/4cfcd7a9fceba662b3c036b7d9a91f6197af046c",
-                "reference": "4cfcd7a9fceba662b3c036b7d9a91f6197af046c",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/177a015cb0e19ff4a49e0e2e2c5fc1c1bee07002",
+                "reference": "177a015cb0e19ff4a49e0e2e2c5fc1c1bee07002",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.9"
+                "php": ">=5.5.9"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.7-dev"
+                    "dev-master": "3.0-dev"
                 }
             },
             "autoload": {
@@ -1290,7 +1290,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2015-11-18 13:41:01"
+            "time": "2015-11-30 12:36:17"
         }
     ],
     "aliases": [],
