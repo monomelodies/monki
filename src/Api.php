@@ -91,7 +91,6 @@ class Api implements StageInterface
              ->when("/(?'table'\w+)/count/")
              ->pipe($validate)
              ->then('monki-count', function ($table) {
-                var_dump($table);
                 return new Item\Cnt($this->adapter, $table);
              });
     }
