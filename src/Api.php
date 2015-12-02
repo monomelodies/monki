@@ -28,12 +28,19 @@ $recurse = function (array &$data) use (&$recurse) {
     }
 };
 
-$recurse($_POST);
+if (isset($_POST['data'])) {
+    $recurse($_POST['data']);
+}
 
 class Api implements StageInterface
 {
     protected $adapter;
     protected $router;
+    protected $routes = [
+        'browse' => "/(?'table'\w+)/",
+        'count' => "/(?'table'\w+)/count/",
+        'item' => "/(?'table'\w+)/(?'id'\d+)/",
+    ];
 
     public function __construct(PDO $adapter, $url = '/')
     {
@@ -41,11 +48,16 @@ class Api implements StageInterface
         $this->router = new Router($url);
     }
 
+    public function setRoute($name, $route)
+    {
+        $this->routes[$name] = $route;
+    }
+
     public function browse(callable $validate = null)
     {
         $validate = $this->validate($validate);
         $this->router
-             ->when("/(?'table'\w+)/")
+             ->when($this->routes['browse'])
              ->pipe($validate)
              ->then(
                 'monki-browse',
@@ -88,7 +100,7 @@ class Api implements StageInterface
     {
         $validate = $this->validate($validate);
         $this->router
-             ->when("/(?'table'\w+)/count/")
+             ->when($this->routes['count'])
              ->pipe($validate)
              ->then('monki-count', function ($table) {
                 return new Item\Cnt($this->adapter, $table);
@@ -99,7 +111,7 @@ class Api implements StageInterface
     {
         $validate = $this->validate($validate);
         $this->router
-             ->when("/(?'table'\w+)/(?'id'\d+)/")
+             ->when($this->routes['item'])
              ->pipe($validate)
              ->then(
                 'monki-item',
