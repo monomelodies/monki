@@ -4,11 +4,7 @@ repo_url: https://github.com/monomelodies/monki
 
 pages:
 - Home:
-    - 'Quickstart': 'index.md'
-- Usage:
-    - 'Creating a simple API': 'simple.md'
-    - 'Validating requests': 'validating.md'
-    - 'Advanced topics': 'advanced.md'
+    - 'User guide': 'index.md'
 
 copyright: Copyright &copy; 2015, <a href="http://www.monomelodies.nl/">Marijn Ophorst</a>
 
