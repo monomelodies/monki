@@ -6,12 +6,32 @@ use PDO;
 use PDOException;
 use Dabble\Query\Where;
 
+/**
+ * Controller to handle CRUD operations on items.
+ */
 class Controller
 {
+    /**
+     * @var PDO $adapter
+     * Database adapter to use.
+     */
     protected $adapter;
+    /**
+     * @var string $table
+     * The table to work on.
+     */
     protected $table;
+    /**
+     * @var null|array $item
+     * The item to work on, or null if we are creating a new one.
+     */
     protected $item;
 
+    /**
+     * @param PDO $adapter
+     * @param string $table
+     * @param null|array $item
+     */
     public function __construct(PDO $adapter, $table, $item = null)
     {
         $this->adapter = $adapter;
@@ -19,6 +39,12 @@ class Controller
         $this->item = $item;
     }
 
+    /**
+     * Private helper to normalize a value (format dates, check null etc.).
+     *
+     * @param mixed $value The value to normalize.
+     * @return mixed $value The normalized value.
+     */
     private function normalize($value)
     {
         if (is_array($value)) {
@@ -39,6 +65,12 @@ class Controller
         return $value;
     }
 
+    /**
+     * Create a new entity in this table.
+     *
+     * @param array $data Hash of column/values to create with.
+     * @return int The new item's serial id, or 0 on failure.
+     */
     public function create(array $data)
     {
         $data = array_map([$this, 'normalize'], $data);
@@ -66,6 +98,13 @@ class Controller
         }
     }
 
+    /**
+     * Replace an entity in this table. Can be used to either insert or update
+     * a record if for whatever reason you're unsure which one to use.
+     *
+     * @param array $data Hash of column/values to replace with.
+     * @return int The new item's serial id, or 0 on failure.
+     */
     public function replace(array $data)
     {
         $data = array_map([$this, 'normalize'], $data);
@@ -91,6 +130,13 @@ class Controller
         return $this->create($data);
     }
 
+    /**
+     * Update an entity in this table. The item _must_ contain an `"id"` key.
+     *
+     * @param array $data Hash of column/values to update with.
+     * @return int The number of affected rows on success (hopefully "1"...) or
+     *  0 on failure.
+     */
     public function update(array $data)
     {
         $data = array_map([$this, 'normalize'], $data);
@@ -114,6 +160,12 @@ class Controller
         }
     }
 
+    /**
+     * Delete an entity in this table. The item _must_ contain an `"id"` key.
+     *
+     * @return int The number of affected rows on success (hopefully "1"...) or
+     *  0 on failure.
+     */
     public function delete()
     {
         if (!isset($this->item)) {
