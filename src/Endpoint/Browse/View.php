@@ -10,17 +10,40 @@ use PDOException;
 use Monki\Response\JsonResponse;
 use Zend\Diactoros\Response\EmptyResponse;
 
+/**
+ * A view representing a list of items. Normally only used internally.
+ */
 class View
 {
+    /**
+     * @var PDO
+     * Database adapter.
+     */
     protected $adapter;
+
+    /**
+     * @var string
+     * The table to work on.
+     */
     protected $table;
 
+    /**
+     * @param PDO $adapter Database adapter to use.
+     * @param string $table The table to work on.
+     */
     public function __construct(PDO $adapter, $table)
     {
         $this->adapter = $adapter;
         $this->table = $table;
     }
 
+    /**
+     * Invoke the view to actually perform getting data etc.
+     *
+     * @return Psr\Http\Message\ResponseInterface An HTTP response. It will be
+     *  of the type Monki\Response\JsonResponse on success, or of the type
+     *  Zend\Diactoros\Response\EmptyResponse(500) on failure.
+     */
     public function __invoke()
     {
         $where = isset($_GET['filter']) ?
@@ -51,6 +74,13 @@ class View
         }
     }
 
+    /**
+     * Internal method to recursively check for "raw" values in a filter.
+     *
+     * @param string $f Json_encoded filter string (typically
+     *  `$_GET['filter']`).
+     * @return array Decoded filter.
+     */
     protected function filter($f)
     {
         $f = json_decode($f, true);
