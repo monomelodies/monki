@@ -9,7 +9,7 @@ use Reroute\Router;
 use Monki\Endpoint\Item;
 use Monki\Endpoint\Browse;
 use Monki\Response\JsonResponse;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\RequestInterface;
 use Zend\Diactoros\Response\EmptyResponse;
 use League\Pipeline\StageInterface;
 
@@ -238,12 +238,12 @@ class Api implements StageInterface
     }
 
     /**
-     * Register 'browse' as a valid action for this API. Browsing is essentially
-     * "SELECT * FROM {table} WHERE {condition} {options}".
+     * Wrap the validation callable in a Monki\Stage object to respect the
+     * League\Pipeline\StageInterface contract.
      *
      * @param callable $validate Optional callback used to check if current user
      *  has access to this feature.
-     * @return void
+     * @return Monki\Stage The callable wrapped in a Stage object.
      */
     protected function validate(callable $validate = null)
     {
@@ -254,12 +254,10 @@ class Api implements StageInterface
     }
 
     /**
-     * Register 'browse' as a valid action for this API. Browsing is essentially
-     * "SELECT * FROM {table} WHERE {condition} {options}".
+     * Process the payload. A front to __invoke.
      *
-     * @param callable $validate Optional callback used to check if current user
-     *  has access to this feature.
-     * @return void
+     * @param mixed $payload
+     * @return mixed Whatever our router comes up with.
      */
     public function process($payload = null)
     {
@@ -267,19 +265,19 @@ class Api implements StageInterface
     }
 
     /**
-     * Register 'browse' as a valid action for this API. Browsing is essentially
-     * "SELECT * FROM {table} WHERE {condition} {options}".
+     * Process the payload. If it is already an instance of RequestInterface, we
+     * assume the pipeline was already resolved. Otherwise delegate control to
+     * the internal router.
      *
-     * @param callable $validate Optional callback used to check if current user
-     *  has access to this feature.
-     * @return void
+     * @param mixed $payload
+     * @return mixed Whatever our router comes up with.
      */
     public function __invoke($payload = null)
     {
-        if (isset($payload) && !($payload instanceof ServerRequestInterface)) {
+        if (isset($payload) && !($payload instanceof RequestInterface)) {
             return $payload;
         }
-        return $this->router->process($payload);
+        return $this->router->__invoke($payload);
     }
 }
 
