@@ -12,17 +12,20 @@ use Dabble\Query\Where;
 class Controller
 {
     /**
-     * @var PDO $adapter
+     * @var PDO
      * Database adapter to use.
      */
     protected $adapter;
+
     /**
-     * @var string $table
+     * @var string
      * The table to work on.
      */
+
     protected $table;
+
     /**
-     * @var null|array $item
+     * @var null|array
      * The item to work on, or null if we are creating a new one.
      */
     protected $item;
