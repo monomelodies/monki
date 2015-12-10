@@ -130,7 +130,7 @@ class Api implements StageInterface
                 }
                 if ($_POST['action'] == 'create') {
                     if ($id == 0) {
-                        return JsonResponse(new StdClass);
+                        return new JsonResponse(new StdClass);
                     }
                     $stmt = $this->adapter->prepare(sprintf(
                         "SELECT * FROM %s WHERE id = ?",
