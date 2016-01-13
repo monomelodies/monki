@@ -96,15 +96,28 @@ class Api implements StageInterface
      * Proxy to the internal `when` method of the Reroute router. Use this to
      * specify custom routes/responses for your API.
      *
-     * @param string url The URL to intercept.
+     * @param string $url The URL to intercept.
+     * @param callable $validate Optional validation pipeline.
      * @return Reroute\Router A Reroute router.
      * @see Reroute\Router::when
      */
-    public function when($url)
+    public function when($url, callable $validate = null)
     {
-        return $this->router->when($url);
+        $validate = $this->validate($validate);
+        return $this->router->when($url)->pipe($validate);
     }
 
+    /**
+     * Proxy to the `pipe` method of the Reroute router.
+     *
+     * @param callable $callback The callback to pipe.
+     * @return Reroute\Router A Reroute router.
+     * @see Reroute\Router::pipe
+     */
+    public function pipe(callable $callback)
+    {
+        return $this->router->pipe($callback);
+    }
 
     /**
      * Register 'browse' as a valid action for this API. Browsing is essentially
