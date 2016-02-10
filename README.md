@@ -92,18 +92,23 @@ support:
 
 use Zend\Diactoros\Response\EmptyResponse;
 
-// Anyone can browse.
-// `browse` etc. calls handle the correct returning of a `ResponseInterface`
-// object from the pipeline; you can use e.g.
-// `Zend\Diactoros\Response\SapiEmitter` to emit that to the client.
-$monki->browse();
 // Only authenticated users can access items:
 $monki->item(function ($request) {
     if (!isset($_SESSION['auth'])) {
         return new EmptyResponse(403);
     }
+// Anyone can browse.
+// `browse` etc. calls handle the correct returning of a `ResponseInterface`
+// object from the pipeline; you can use e.g.
+// `Zend\Diactoros\Response\SapiEmitter` to emit that to the client.
+$monki->browse();
 });
 ```
+
+Note that it is imperative that you call `item` before `browse` since Reroute
+matches routes in the order they are defined; since `(\w+)` for the table would
+also match `"/table/id/"` you would otherwise erroneously end up with browse
+views when requesting a specific row.
 
 ## Custom states
 To extend your API with extra calls, simply `extend` the `Monki\Api` object with
