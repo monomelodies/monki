@@ -24,7 +24,7 @@
         "ext-pcre": "*",
         "ext-reflection": "*",
         "ext-spl": "*",
-        "monomelodies/dabble": "^1.2",
+        "monomelodies/dabble": "^1.5",
         "monomelodies/reroute": "^3.3.0",
         "zendframework/zend-diactoros": "^1.2@dev"
     },
