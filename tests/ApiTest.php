@@ -69,7 +69,7 @@ class MonkiApiTest extends PHPUnit_Extensions_Database_TestCase
         $response = $api(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
         $this->assertEquals(4, count($found));
-        $_POST = ['action' => 'create', 'data' => ['content' => 'whee']];
+        $_POST = ['content' => 'whee'];
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/foo/';
         $response = $api(ServerRequestFactory::fromGlobals());
@@ -106,13 +106,13 @@ class MonkiApiTest extends PHPUnit_Extensions_Database_TestCase
         $response = $api(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
         $this->assertEquals('bar', $found['content']);
-        $_POST = ['action' => 'update', 'data' => ['content' => 'boo']];
+        $_POST = ['content' => 'boo'];
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/foo/1/';
         $response = $api(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
         $this->assertEquals('boo', $found['content']);
-        $_POST = ['action' => 'delete'];
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
         $response = $api(ServerRequestFactory::fromGlobals());
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/foo/count/';
