@@ -247,20 +247,28 @@ class Api implements StageInterface
                     $table,
                     $item
                 );
-                if (!isset($_POST['action'])) {
-                    $_POST['action'] = 'update';
+                $action = 'update';
+                if (!isset($_POST['id']) || !$_POST['id']) {
+                    $action = 'create';
                 }
-                if (method_exists($controller, $_POST['action'])) {
-                    $controller->{$_POST['action']}(
-                        isset($_POST['data']) ? $_POST['data'] : null
-                    );
-                    if ($_POST['action'] == 'delete') {
-                        return new EmptyResponse(204);
-                    }
+                if (method_exists($controller, $action)) {
+                    $controller->$action($_POST);
                     return $GET;
                 } else {
                     return new EmptyResponse(405);
                 }
+            })->delete(function ($table, $id, callable $GET) use ($getitem) {
+                $item = $getitem($table, $id);
+                if (!is_array($item)) {
+                    return $item;
+                }
+                $controller = new Item\Controller(
+                    $this->adapter,
+                    $table,
+                    $item
+                );
+                $controller->delete();
+                return new EmptyResponse(204);
             });
     }
 
