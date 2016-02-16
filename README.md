@@ -70,14 +70,10 @@ something else.
 ## Adding states and responses
 Monki defines default states for `browse` (list of items), `item` (a single
 item) and `count` (a count of items matching conditions). A `POST` to `browse`
-is equal to creating a new item, a `POST` to `item` is either an update or a
-delete, depending on the value of the `action` parameter. Each method accepts
-an optional `$validate` callable which will be added to Monki's internal
-pipeline. This can be used to e.g. check access to a certain URL.
-
-> Monki deliberately does not use HTTP `PUT` and `DELETE` verbs, as support for
-> them is sketchy at best, especially when your API needs to be accessed via
-> [CORS](http://enable-cors.org/).
+is equal to creating a new item, a `POST` to `item` is an update and a `DELETE`
+to an item is a deletion. Each method accepts an optional `$validate` callable
+which will be added to Monki's internal pipeline. This can be used to e.g. check
+access to a certain URL.
 
 URLs get appended to the `$url` you passed as the second argument to the
 constructor (which may, by the way, optionally contain a scheme/domain). The
@@ -105,10 +101,10 @@ $monki->browse();
 });
 ```
 
-Note that it is imperative that you call `item` before `browse` since Reroute
-matches routes in the order they are defined; since `(\w+)` for the table would
-also match `"/table/id/"` you would otherwise erroneously end up with browse
-views when requesting a specific row.
+Note that it is imperative that you call `item` and/or `count` before `browse`
+since Reroute matches routes in the order they are defined; since `(\w+)` for
+the table would also match `"/table/id/"` you would otherwise erroneously end up
+with browse views when requesting a specific row.
 
 ## Custom states
 To extend your API with extra calls, simply `extend` the `Monki\Api` object with
@@ -165,8 +161,8 @@ their routes match _before_ Monki handles the request, and return a 400 resopnse
 or something.
 
 ## Inserting server-side `$_POST` values
-Monki recursively traverses each entry in `$_POST['data']` (if set) and checks
-if any value is a callable. To prevent accidental matching to one of PHP's many
+Monki recursively traverses each entry in `$_POST` (if set) and checks if any
+value is a callable. To prevent accidental matching to one of PHP's many
 built-in functions, the name should be wrapped in `$(...)`.
 
 If a function of that name is found (note that for namespaced functions you must
@@ -178,7 +174,7 @@ use the full namespace!), its return value is assigned instead.
 > `['functionName': 'strpos']` as `$_POST` data!
 
 A common use would be to get the current user id without having to pass it
-around in the frontend, thus immedialy also forcing validation (e.g. with a
+around in the frontend, thus immediately also forcing validation (e.g. with a
 `NOT NULL` constraint in your schema:
 
 ```php
@@ -223,7 +219,7 @@ $.get('/path/to/endpoint?options=' + JSON.stringify({order: 'datecreated DESC'})
 
 Dabble takes care of escaping filters. For options, this is not possible; but
 PHP's `PDO` extension (which Dabble uses) _should_ prevent running multiple
-queries in one `execute` call.
+queries in one `execute` call and ignores "unknown" options. Take care, though.
 
 ## Passing raw values in filters or options
 Dabble offers a `Dabble\Query\Raw` object that tells the query builder to
