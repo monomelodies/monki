@@ -143,33 +143,24 @@ class Api implements StageInterface
                 return new Browse\View($this->adapter, $table);
             })
             ->post(function ($table, callable $GET) {
-                if (!isset($_POST['action'])) {
-                    $_POST['action'] = 'create';
-                }
                 $controller = new Item\Controller(
                     $this->adapter,
                     $table
                 );
-                if (method_exists($controller, $_POST['action'])) {
-                    $id = $controller->{$_POST['action']}(
-                        isset($_POST['data']) ? $_POST['data'] : []
-                    );
+                $id = $controller->create($_POST);
+                if ($id == 0) {
+                    return new JsonResponse(new StdClass);
                 }
-                if ($_POST['action'] == 'create') {
-                    if ($id == 0) {
-                        return new JsonResponse(new StdClass);
-                    }
-                    $stmt = $this->adapter->prepare(sprintf(
-                        "SELECT * FROM %s WHERE id = ?",
-                        $table
-                    ));
-                    try {
-                        $stmt->execute([$id]);
-                        $item = $stmt->fetch(PDO::FETCH_ASSOC);
-                        return new JsonResponse($item);
-                    } catch (PDOException $e) {
-                        return new EmptyResponse(500);
-                    }
+                $stmt = $this->adapter->prepare(sprintf(
+                    "SELECT * FROM %s WHERE id = ?",
+                    $table
+                ));
+                try {
+                    $stmt->execute([$id]);
+                    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                    return new JsonResponse($item);
+                } catch (PDOException $e) {
+                    return new EmptyResponse(500);
                 }
                 return $GET;
             });
@@ -247,16 +238,8 @@ class Api implements StageInterface
                     $table,
                     $item
                 );
-                $action = 'update';
-                if (!isset($_POST['id']) || !$_POST['id']) {
-                    $action = 'create';
-                }
-                if (method_exists($controller, $action)) {
-                    $controller->$action($_POST);
-                    return $GET;
-                } else {
-                    return new EmptyResponse(405);
-                }
+                $controller->update($_POST);
+                return $GET;
             })->delete(function ($table, $id, callable $GET) use ($getitem) {
                 $item = $getitem($table, $id);
                 if (!is_array($item)) {
