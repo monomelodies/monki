@@ -23,11 +23,7 @@ class JsonResponse extends HtmlResponse
         $headers['access-control-allow-headers'] =
             "Content-Type, Authorization, Content-Length, X-Requested-With";
         if (isset($_SERVER['HTTP_ORIGIN'])) {
-            $response = $response
-                ->withHeader(
-                    "Access-Control-Allow-Origin",
-                    $_SERVER['HTTP_ORIGIN']
-                );
+            $headers['access-control-allow-origin'] = $_SERVER['HTTP_ORIGIN'];
         }
         parent::__construct($json, $status, $headers);
     }
