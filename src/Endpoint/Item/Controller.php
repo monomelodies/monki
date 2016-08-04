@@ -1,6 +1,6 @@
 <?php
 
-namespace Monki\Endpoint\Item;
+namespace Monomelodies\Monki\Endpoint\Item;
 
 use PDO;
 use PDOException;
