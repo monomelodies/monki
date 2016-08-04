@@ -1,6 +1,6 @@
 <?php
 
-namespace Monki;
+namespace Monomelodies\Monki;
 
 use League\Pipeline\StageInterface;
 
