@@ -1,6 +1,6 @@
 <?php
 
-namespace Monki\Response;
+namespace Monomelodies\Monki\Response;
 
 use Zend\Diactoros\Response\HtmlResponse;
 
