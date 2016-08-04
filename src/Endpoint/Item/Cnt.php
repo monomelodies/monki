@@ -1,11 +1,11 @@
 <?php
 
-namespace Monki\Endpoint\Item;
+namespace Monomelodies\Monki\Endpoint\Item;
 
 use PDO;
 use PDOException;
-use Dabble\Query\Where;
-use Monki\Response\JsonResponse;
+use Monolyth\Dabble\Query\Where;
+use Monomelodies\Monki\Response\JsonResponse;
 use Zend\Diactoros\Response\EmptyResponse;
 
 /**
