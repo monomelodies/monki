@@ -1,12 +1,12 @@
 <?php
 
-namespace Monki\Tests;
+namespace Monomelodies\Monki\Tests;
 
-use Monki\Api;
-use Reroute\Router;
+use Monomelodies\Monki\Api;
+use Monolyth\Reroute\Router;
 use Zend\Diactoros\ServerRequestFactory;
 use PHPUnit_Extensions_Database_TestCase;
-use Dabble\Adapter\Sqlite;
+use Monolyth\Dabble\Adapter\Sqlite;
 
 class MonkiApiTest extends PHPUnit_Extensions_Database_TestCase
 {
