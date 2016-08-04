@@ -1,13 +1,13 @@
 <?php
 
-namespace Monki\Endpoint\Browse;
+namespace Monomelodies\Monki\Endpoint\Browse;
 
-use Dabble\Query\Where;
-use Dabble\Query\Options;
-use Dabble\Query\Raw;
+use Monolyth\Dabble\Query\Where;
+use Monolyth\Dabble\Query\Options;
+use Monolyth\Dabble\Query\Raw;
 use PDO;
 use PDOException;
-use Monki\Response\JsonResponse;
+use Monomelodies\Monki\Response\JsonResponse;
 use Zend\Diactoros\Response\EmptyResponse;
 
 /**
