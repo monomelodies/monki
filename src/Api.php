@@ -1,14 +1,14 @@
 <?php
 
-namespace Monki;
+namespace Monomelodies\Monki;
 
 use StdClass;
 use PDO;
 use PDOException;
-use Reroute\Router;
-use Monki\Endpoint\Item;
-use Monki\Endpoint\Browse;
-use Monki\Response\JsonResponse;
+use Monolyth\Reroute\Router;
+use Monomelodies\Monki\Endpoint\Item;
+use Monomelodies\Monki\Endpoint\Browse;
+use Monomelodies\Monki\Response\JsonResponse;
 use Psr\Http\Message\RequestInterface;
 use Zend\Diactoros\Response\EmptyResponse;
 use League\Pipeline\StageInterface;
