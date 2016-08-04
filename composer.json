@@ -34,13 +34,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Monki\\": "src"
+            "Monomelodies\\Monki\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Monki\\": "src",
-            "Monki\\Tests\\": "tests"
+            "Monomelodies\\Monki\\": "src",
+            "Monomelodies\\Monki\\Tests\\": "tests"
         }
     }
 }
