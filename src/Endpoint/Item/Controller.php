@@ -83,7 +83,7 @@ class Controller
                 if (isset($item['id'])) {
                     $item = $item['id'];
                 } else {
-                    unset($data[$key]);
+                    $item = json_encode($item);
                 }
             }
         }
@@ -95,7 +95,7 @@ class Controller
                 implode(', ', array_fill(0, count($data), '?'))
             ));
             $stmt->execute(array_values($data));
-            return $this->adapter->lastInsertId();
+            return $this->adapter->lastInsertId($this->table);
         } catch (PDOException $e) {
             return 0;
         }
