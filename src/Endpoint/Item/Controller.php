@@ -143,6 +143,15 @@ class Controller
     public function update(array $data)
     {
         $data = array_map([$this, 'normalize'], $data);
+        foreach ($data as $key => &$item) {
+            if (is_array($item)) {
+                if (isset($item['id'])) {
+                    $item = $item['id'];
+                } else {
+                    $item = json_encode($item);
+                }
+            }
+        }
         $fields = [];
         foreach ($data as $name => $value) {
             $fields[] = sprintf('%s = ?', $name);
