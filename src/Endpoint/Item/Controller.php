@@ -116,7 +116,7 @@ class Controller
                 if (isset($item['id'])) {
                     $item = $item['id'];
                 } else {
-                    unset($data[$key]);
+                    $item = json_encode($item);
                 }
             }
         }
