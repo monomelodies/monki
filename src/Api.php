@@ -61,7 +61,7 @@ class Api implements StageInterface
     protected $routes = [
         'browse' => "/(?'table'\w+)/",
         'count' => "/(?'table'\w+)/count/",
-        'item' => "/(?'table'\w+)/(?'id'\d+)/",
+        'item' => "/(?'table'\w+)/(?'id'.*?)/",
     ];
 
     /**
@@ -226,6 +226,8 @@ class Api implements StageInterface
                 $item = $getitem($table, $id);
                 if (is_array($item)) {
                     $item = new JsonResponse($item);
+                } else {
+                    $item = new EmptyResponse(404);
                 }
                 return $item;
             })->post(function ($table, $id, callable $GET) use ($getitem) {
