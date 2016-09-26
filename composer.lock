@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "437121c9da4a9f2ca23e6d55b30d3de0",
-    "content-hash": "8884b916111b08ed9ddf4bae030af00f",
+    "hash": "b14fdac4be498ace908f2db5042e77c5",
+    "content-hash": "86153a05dd16a75c881ecbcd30fe9cb1",
     "packages": [
         {
             "name": "jakeasmith/http_build_url",
@@ -42,6 +42,69 @@
             ],
             "description": "Provides functionality for http_build_url() to environments without pecl_http.",
             "time": "2015-05-06 12:27:20"
+        },
+        {
+            "name": "league/fractal",
+            "version": "0.14.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/fractal.git",
+                "reference": "56ad8933fbb40328ca3321c84143b2c16186eebf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/fractal/zipball/56ad8933fbb40328ca3321c84143b2c16186eebf",
+                "reference": "56ad8933fbb40328ca3321c84143b2c16186eebf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "illuminate/contracts": "~5.0",
+                "mockery/mockery": "~0.9",
+                "pagerfanta/pagerfanta": "~1.0.0",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~1.5",
+                "zendframework/zend-paginator": "~2.3"
+            },
+            "suggest": {
+                "illuminate/pagination": "The Illuminate Pagination component.",
+                "pagerfanta/pagerfanta": "Pagerfanta Paginator",
+                "zendframework/zend-paginator": "Zend Framework Paginator"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.13-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Fractal\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Phil Sturgeon",
+                    "email": "me@philsturgeon.uk",
+                    "homepage": "http://philsturgeon.uk/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Handle the output of complex data structures ready for API output.",
+            "homepage": "http://fractal.thephpleague.com/",
+            "keywords": [
+                "api",
+                "json",
+                "league",
+                "rest"
+            ],
+            "time": "2016-07-21 09:56:14"
         },
         {
             "name": "league/pipeline",
@@ -89,51 +152,6 @@
                 "sequential"
             ],
             "time": "2015-06-25 16:50:06"
-        },
-        {
-            "name": "monolyth/dabble",
-            "version": "1.6.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/monolyth-php/dabble.git",
-                "reference": "36dc35c790d3ffd681334f16554d77adcb781827"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/monolyth-php/dabble/zipball/36dc35c790d3ffd681334f16554d77adcb781827",
-                "reference": "36dc35c790d3ffd681334f16554d77adcb781827",
-                "shasum": ""
-            },
-            "require": {
-                "nesbot/carbon": "^1.21",
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "gentry/gentry": "^0.9.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Monolyth\\Dabble\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marijn Ophorst",
-                    "email": "marijn@monomelodies.nl"
-                }
-            ],
-            "description": "PHP5 database abstraction layer",
-            "keywords": [
-                "abstraction",
-                "database",
-                "php"
-            ],
-            "time": "2016-07-10 14:54:23"
         },
         {
             "name": "monolyth/reroute",
@@ -276,6 +294,87 @@
                 "response"
             ],
             "time": "2015-05-04 20:22:00"
+        },
+        {
+            "name": "quibble/dabble",
+            "version": "1.7.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quibble-dbal/dabble.git",
+                "reference": "dbfac04b0fd52f818589914db5189901003148a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quibble-dbal/dabble/zipball/dbfac04b0fd52f818589914db5189901003148a6",
+                "reference": "dbfac04b0fd52f818589914db5189901003148a6",
+                "shasum": ""
+            },
+            "require": {
+                "nesbot/carbon": "^1.21",
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "gentry/gentry": "^0.10.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Quibble\\Dabble\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marijn Ophorst",
+                    "email": "marijn@monomelodies.nl"
+                }
+            ],
+            "description": "DBAL for Quibble",
+            "time": "2016-09-11 12:29:24"
+        },
+        {
+            "name": "quibble/query",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quibble-dbal/query.git",
+                "reference": "ab2e27708fcfc8d99fd3c369b906b213148f2ac3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quibble-dbal/query/zipball/ab2e27708fcfc8d99fd3c369b906b213148f2ac3",
+                "reference": "ab2e27708fcfc8d99fd3c369b906b213148f2ac3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0",
+                "quibble/dabble": "^1.7.2"
+            },
+            "require-dev": {
+                "gentry/gentry": "^0.10.2",
+                "quibble/sqlite": "^1.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Quibble\\Query\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marijn Ophorst",
+                    "email": "marijn@monomelodies.nl"
+                }
+            ],
+            "description": "Query builder for Quibble",
+            "time": "2016-09-11 14:53:17"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -505,6 +604,51 @@
                 "instantiate"
             ],
             "time": "2015-06-14 21:17:01"
+        },
+        {
+            "name": "monolyth/dabble",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/monolyth-php/dabble.git",
+                "reference": "36dc35c790d3ffd681334f16554d77adcb781827"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/monolyth-php/dabble/zipball/36dc35c790d3ffd681334f16554d77adcb781827",
+                "reference": "36dc35c790d3ffd681334f16554d77adcb781827",
+                "shasum": ""
+            },
+            "require": {
+                "nesbot/carbon": "^1.21",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "gentry/gentry": "^0.9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Monolyth\\Dabble\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marijn Ophorst",
+                    "email": "marijn@monomelodies.nl"
+                }
+            ],
+            "description": "PHP5 database abstraction layer",
+            "keywords": [
+                "abstraction",
+                "database",
+                "php"
+            ],
+            "time": "2016-07-10 14:54:23"
         },
         {
             "name": "phpdocumentor/reflection-common",
