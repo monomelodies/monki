@@ -4,6 +4,7 @@ namespace Monomelodies\Monki\Endpoint\Item;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 use Dabble\Query\Where;
 
 /**
