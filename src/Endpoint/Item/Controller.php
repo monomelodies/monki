@@ -94,7 +94,8 @@ class Controller
                 implode(', ', array_keys($data)),
                 implode(', ', array_fill(0, count($data), '?'))
             ));
-            $stmt->execute(array_values($data));
+            $this->bindParams($stmt, $data);
+            $stmt->execute();
             return $this->adapter->lastInsertId($this->table);
         } catch (PDOException $e) {
             return 0;
@@ -127,7 +128,8 @@ class Controller
                 $this->table,
                 $where
             ));
-            $stmt->execute($where->getBindings());
+            $this->bindParams($stmt, $where->getBindings());
+            $stmt->execute();
         } catch (PDOException $e) {
         }
         return $this->create($data);
@@ -162,10 +164,11 @@ class Controller
                 $this->table,
                 implode(', ', $fields)
             ));
-            $stmt->execute(array_merge(
+            $this->bindParams($stmt, array_merge(
                 array_values($data),
                 [$this->item['id']]
             ));
+            $stmt->execute();
             return $stmt->rowCount();
         } catch (PDOException $e) {
             return 0;
@@ -192,6 +195,21 @@ class Controller
             return $stmt->rowCount();
         } catch (PDOException $e) {
             return 0;
+        }
+    }
+
+    private function bindParams(PDOStatement $stmt, array $data)
+    {
+        $i = 1;
+        foreach ($data as $value) {
+            if (is_null($value)) {
+                $stmt->bindValue($i, $value, PDO::PARAM_NULL);
+            } elseif (is_bool($value)) {
+                $stmt->bindValue($i, $value, PDO::PARAM_BOOL);
+            } else {
+                $stmt->bindValue($i, $value, PDO::PARAM_STR);
+            }
+            ++$i;
         }
     }
 }
