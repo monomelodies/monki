@@ -303,6 +303,10 @@ reason need to override either. The `@Url` annotation is appended to whatever
 base URL you gave the `Api` constructor. If omitted it is that URL that will be
 used verbatim (e.g. to handle `HEAD` or `OPTIONS`).
 
+## Handling things like pagination etc. based on GET or POST parameters
+Knock yourself out in your handlers! You could also transform your data here,
+e.g. `json_encode` certain fields before storage.
+
 ## What's with that name, Monki?
 I'm bilingual, and in Dutch "API" is pronounced like the word for "little
 monkey". So that's why.
