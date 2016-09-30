@@ -29,9 +29,7 @@
         "league/fractal": "^0.14.0"
     },
     "require-dev": {
-        "gentry/gentry": "^0.10.2",
-        "quibble/query": "^0.2.0",
-        "quibble/sqlite": "^1.6"
+        "gentry/gentry": "^0.10.2"
     },
     "autoload": {
         "psr-4": {
