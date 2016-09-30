@@ -24,14 +24,14 @@
         "ext-pcre": "*",
         "ext-reflection": "*",
         "ext-spl": "*",
-        "quibble/query": "^0.2.0",
-        "monolyth/reroute": "^3.5.0",
+        "monolyth/reroute": "^3.6.0",
         "zendframework/zend-diactoros": "^1.2@dev",
         "league/fractal": "^0.14.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.0.0",
-        "phpunit/dbunit": "^1.2"
+        "gentry/gentry": "^0.10.2",
+        "quibble/query": "^0.2.0",
+        "quibble/sqlite": "^1.6"
     },
     "autoload": {
         "psr-4": {
@@ -40,7 +40,6 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Monomelodies\\Monki\\": "src",
             "Monomelodies\\Monki\\Tests\\": "tests"
         }
     }
