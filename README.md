@@ -25,16 +25,14 @@ autoloader for the `Monki\\` namespace.
 
 ## Setting up
 Monki implements a _pipeline_ using
-[league/pipeline](https://packagist.org/packages/league/pipeline). It also needs
-a `PDO` adapter on construction to query your database:
+[league/pipeline](https://packagist.org/packages/league/pipeline):
 
 ```php
 <?php
 
 use Monki\Api;
 
-$db = new PDO($dsn, $user, $pass, $options);
-$monki = new Monki($db, '/base/url/of/api/');
+$monki = new Monki('/base/url/of/api/');
 ```
 
 Your front controller (e.g. `index.php`) can then add it to its pipeline (see
@@ -54,8 +52,9 @@ inspect its return value:
 <?php
 
 use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\ServerRequestFactory;
 
-$response = $monki();
+$response = $monki(ServerRequestFactory::fromGlobals());
 if ($response instanceof ResponseInterface) {
     // Emit the response
 } else {
@@ -68,191 +67,243 @@ is a requirement of Monki, so you already have it. But you're free to use
 something else.
 
 ## Adding states and responses
-Monki defines default states for `browse` (list of items), `item` (a single
-item) and `count` (a count of items matching conditions). A `POST` to `browse`
-is equal to creating a new item, a `POST` to `item` is an update and a `DELETE`
-to an item is a deletion. Each method accepts an optional `$validate` callable
-which will be added to Monki's internal pipeline. This can be used to e.g. check
-access to a certain URL.
+Internally Monki's pipeline utilises the
+[`Monolyth\Reroute`](http://monolyth.monomelodies.nl/reroute/) router. Reroute
+lets you specify the desired handling of HTTP requests using `when('url')` and
+`then('statename', callable)`. Additionally you can specify callables for
+`post`, `put` and `delete` and can add pipeline stages to e.g. check user access
+to certain functions. You can specify all of these manually since the `when`
+method on Monki returns the actual underlying router.
 
-URLs get appended to the `$url` you passed as the second argument to the
-constructor (which may, by the way, optionally contain a scheme/domain). The
-defaults are `/{table}/` for browse, `/{table}/{id}/` for items and
-`/{table}/count/` for counting.
+However, _normally_ any well-structured API will follow a pattern more similar
+to this:
 
-By default, nothing is exposed. You'll need to specify what your API should
-support:
+```
+GET /api/user/ <- browse all users
+POST /api/user/ <- create a new user
+GET /api/user/:id/ <- retrieve a specific user
+POST /api/user/:id/ <- update a specific user
+DELETE /api/user/:id/ <- delete a specific user
+```
+
+This is exactly the sort of "default" API behaviour Monki aims to make easy to
+bootstrap! It uses the `crud` method for this:
 
 ```php
 <?php
 
+use Monomelodies\Monki\Handler\Crud;
+
+class MyHandler extends Crud
+{
+}
+
+$monki->crud('/api/user/:id?/', new MyHandler);
+
+```
+
+In the above example, we simply pass it an instance of the `Crud` handler
+interface. The return value of the `crud` method can again be pipelined, e.g.
+for access checks. The question mark after the `":id"` parameter tells Reroute
+it is an optional parameter.
+
+If you try to access the URL `/api/user/`, you won't get a list of users yet but
+rather a `Zend\Diactoros\Response\EmptyResponse` with a status code of 501 (not
+implemented). This makes sense, since our handler doesn't actually specify any
+handling yet! Hey, come on, Monki isn't clairvoyant...
+
+Let's first make it respond to `browse`-style requests:
+
+```php
+<?php
+
+use Monomelodies\Monki\Handler\Crud;
+
+class MyHandler extends Crud
+{
+    public function browse($id = null)
+    {
+        // This should e.g. do a database query in real life:
+        $users = ['Marijn', 'Linus', 'Bill'];
+        return $this->jsonResponse($users);
+    }
+}
+
+```
+
+The list of default supported handlers is as follows:
+
+- `Handler\Crud::browse`
+- `Handler\Crud::create`
+- `Handler\Crud::retrieve`
+- `Handler\Crud::update`
+- `Handler\Crud::delete`
+
+To reuse your handler for multiple tables, you could e.g. pass the table name in
+the constructor and store it privately.
+
+## Full example
+The following is a complete, working example using `Quibble\Query` for database
+querying (see [their documentation](http://quibble.monomelodies.nl/query/) for
+more information on the Quibble query builder).
+
+```php
+<?php
+
+use Quibble\Dabble\Adapter;
 use Zend\Diactoros\Response\EmptyResponse;
 
-// Only authenticated users can access items:
-$monki->item(function ($request) {
-    if (!isset($_SESSION['auth'])) {
+class MyHandler extends Crud implements Browse, Create, Retrieve, Update, Delete
+{
+    private $db;
+    private $table;
+
+    public function __construct(Adapter $db, $table)
+    {
+        $this->db = $db;
+        $this->table = $table;
+    }
+
+    public function browse($id = null)
+    {
+        $items = $this->db->selectFrom($this->table)
+            ->fetchAll(PDO::FETCH_ASSOC);
+        return $this->jsonResponse($items);
+    }
+
+    public function create($id = null)
+    {
+        $this->db->insertInto($this->table)
+            ->execute($_POST);
+        $id = $this->db->lastInsertId($this->table);
+        return $this->retrieve($id, 201);
+    }
+
+    public function retrieve($id, $status = 200)
+    {
+        $item = $this->db->selectFrom($this->table)
+            ->where('id = ?', $id)
+            ->fetch(PDO::FETCH_ASSOC);
+        return $this->jsonResponse($item, $status);
+    }
+
+    public function update($id)
+    {
+        $this->db->updateTable($this->table)
+            ->where('id = ?', $id)
+            ->execute($_POST);
+        return $this->retrieve($id);
+    }
+
+    public function delete($id)
+    {
+        $this->db->deleteFrom($this->table)
+            ->where('id = ?', $id)
+            ->execute();
+        return $this->emptyResponse(204);
+    }
+}
+
+// Assuming $user contains the currently logged in user...
+$monki->crud('/api/user/:id/', new MyHandler($db, 'user'))
+    ->pipe(function ($payload) use ($user) {
+        if ($user->name != 'Marijn') {
+            // Bad user! No access.
+            return new EmptyResponse(403);
+        }
+        return $payload;
+    });
+
+```
+
+Obviously this is rather bare bones as it does zero error checking, but you get
+the idea. Using this handler class, you can quickly setup handling for a handful
+of database tables:
+
+```php
+<?php
+
+$check = function ($payload) use ($user) {
+    if ($user->name != 'Marijn') {
+        // Bad user! No access.
         return new EmptyResponse(403);
     }
-// Anyone can browse.
-// `browse` etc. calls handle the correct returning of a `ResponseInterface`
-// object from the pipeline; you can use e.g.
-// `Zend\Diactoros\Response\SapiEmitter` to emit that to the client.
-$monki->browse();
-});
-```
-
-Note that it is imperative that you call `item` and/or `count` before `browse`
-since Reroute matches routes in the order they are defined; since `(\w+)` for
-the table would also match `"/table/id/"` you would otherwise erroneously end up
-with browse views when requesting a specific row.
-
-## Custom states
-To extend your API with extra calls, simply `extend` the `Monki\Api` object with
-a more specific class of your own. Alternatively, Monki internally uses
-[Reroute](http://reroute.monomelodies.nl) for routing, so you could also use
-this and define custom calls before calling Monki:
-
-```php
-<?php
-
-use Reroute\Router;
-use Monki\Api;
-
-$router->when('/some/custom/url/')->then('custom', function () {
-    // ...handle, return ResponseInterface
-});
-$monki = new Api($myDatabase, '/some/other/url/');
-// ...
-```
-
-Or you can pass pipe Monki to Reroute (or vice versa, they both implement
-pipelines):
-
-```php
-<?php
-
-// ...as above, only:
-$router->pipe($monki);
-// or, depending on your pipe logic:
-$monki->pipe($router);
-```
-
-## Custom routes
-The `Api` class offers a `setRoute` method. This allows you to override the
-default route for `browse`, `item` or `count` (or custom actions you might have
-defined, if you use `$this->routes` internally) for subsequent calls.
-
-The first argument is the "type" of the route (i.e. the key). The second
-argument is simply the regex for the route. Take care to use named matches
-(e.g. `"/(?'table'\w+)/"` with the expected names.
-
-The new route will be valid for all calls to e.g. `browse` _after_ the
-`setRoute` definition. Any previous calls remain untouched.
-
-## Internal workings
-Monki is very "dumb" in its understanding of your database: it blindly assumes
-the `table` passed exists, and whatever you `$_POST` to it can be inserted or
-updated or deleted (the entire contents of `$_POST['data']` are treated as
-key/value pairs of data). It does catch `PDOException`s, but makes no other
-attempt to validate your data. If you need that, do it yourself.
-
-A quick and dirty way to prevent access to certain tables is to simply make
-their routes match _before_ Monki handles the request, and return a 400 resopnse
-or something.
-
-## Inserting server-side `$_POST` values
-Monki recursively traverses each entry in `$_POST` (if set) and checks if any
-value is a callable. To prevent accidental matching to one of PHP's many
-built-in functions, the name should be wrapped in `$(...)`.
-
-If a function of that name is found (note that for namespaced functions you must
-use the full namespace!), its return value is assigned instead.
-
-> The `$(...)` wrapper is used to minimize the risk of accidentally passing a
-> string that happens to resolve to one of the gazillion PHP functions out
-> there. Otherwise Monki could never accept something like
-> `['functionName': 'strpos']` as `$_POST` data!
-
-A common use would be to get the current user id without having to pass it
-around in the frontend, thus immediately also forcing validation (e.g. with a
-`NOT NULL` constraint in your schema:
-
-```php
-<?php
-
-namespace Monki;
-
-function userAdminId() {
-    return isset($_SESSION['User']) && $_SESSION['User']['admin'] ?
-        $_SESSION['User']['id'] :
-        null;
+    return $payload;
 };
+$monki->crud('/api/user/:id/', new MyHandler($db, 'user'))->pipe($check);
+$monki->crud('/api/message/:id/', new MyHandler($db, 'message'))->pipe($check);
+$monki->crud('/api/foo/:id/', new MyHandler($db, 'foo'))->pipe($check);
+$monki->crud('/api/bar/:id/', new MyHandler($db, 'bar'))->pipe($check);
+// This endpoint is open for the world (usually a bad idea ;)):
+$monki->crud('/api/baz/:id/', new MyHandler($db, 'baz'));
+// ...
+
 ```
 
-You could now pass the following to ensure "admin level access":
+For convenience, any CRUD method throwing an exception by default automatically
+results in a 400 Bad Request response. You can always catch these errors in your
+handler itself and return something more appropriate if you wish.
 
-```javascript
-$.post('/path/to/endpoint/', {
-    owner: '$(userAdminId)',
-    foo: 'foo',
-    bar: 'bar'
-});
-```
+## Transforming responses
+Monki comes with `League\Fractal` bundled as a dependency. Using Fractal, you
+can add "transformers" to your responses. To do so, pass a transformer object
+extending `League\Fractal\TransformerAbstract` as a third argument to the `crud`
+method. See their documentation for more information on this. Any response that
+isn't Json will ignore the transformer.
 
-(The example is in jQuery for convenience, but you get the idea.)
+Using a transformer is very handy for massaging your data prior to emitting a
+response. E.g., in our user example the table would likely also contain a `pass`
+column which we don't want to expose. Or we could use it to cast the user id to
+an actual integer instead of a string.
 
-## Passing parameters to API calls
-Internally, Monki uses the [Dabble database
-abstraction](http://dabble.monomelodies.nl). This means that you can pass
-filters (`WHERE` clauses) and options (`LIMIT`, `OFFSET` etc.) as JSON-encoded
-`$_GET` parameters.
-
-Passing `filter` and/or `options` is mostly useful when doing `browse` and
-`count` API queries. For single items, they rarely make sense.
-
-```javascript
-// Filter on foo = 'bar'
-$.get('/path/to/endpoint?filter=' + JSON.stringify({foo: 'bar'}));
-// Order by datecreated DESC:
-$.get('/path/to/endpoint?options=' + JSON.stringify({order: 'datecreated DESC'}));
-```
-
-Dabble takes care of escaping filters. For options, this is not possible; but
-PHP's `PDO` extension (which Dabble uses) _should_ prevent running multiple
-queries in one `execute` call and ignores "unknown" options. Take care, though.
-
-## Passing raw values in filters or options
-Dabble offers a `Dabble\Query\Raw` object that tells the query builder to
-treat it contents (the constructor argument) verbatim (i.e., do no
-quoting/escaping).
-
-Since passing raw values from the client in JSON is an obvious security risk,
-you'll need to handle these yourself if you need them. An example would be
-implementing a filter like `datecreated > NOW()`; `NOW()` is a "raw" parameter.
-
-A simple strategy could be to examine `$_GET['filter']` and pre-parse it
-accordingly in your front controller (taking care to validate data before you
-pass it to `Raw`...). You could also extend the `Api` class and override the
-`browse` method, or define a special route altogether (e.g.
-`/browse/bydate/`).
-
-> For the love of all that is beautiful, _please_ be _very_ careful about
-> sanitizing your data if you accept "raw" input! It's supported, but that
-> doesn't mean it's recommended...
-
-## (CORS) headers
-The Monki pipeline returns a `JsonResponse` object, which in turn extends
-`Zend\Diactoros\Response`. Simply emit the response with the added headers
-instead:
+## Adding custom methods
+Let's say we also need to add endpoints to the API for counting the total number
+of items in a collection (e.g. for pagination). This is possible using
+_annotations_:
 
 ```php
 <?php
 
-$response = $monki();
-// "emit" should do the emitting in this example:
-emit($reponse->withHeader('Access-Control-Allow-Origin', '*'));
+class MyHandler extends Crud
+{
+    /**
+     * @Method GET
+     * @Url {base}/count/
+     */
+    public function countIt()
+    {
+        return $this->jsonResponse(3);
+    }
+}
+
 ```
 
-Of course, you'd want to inspect the response first before doing this, but you
-get the idea.
+To define a custom method for an endpoint with a resource, simply require the
+associated parameters in the method:
+
+```php
+<?php
+
+class MyHandler extends Crud
+{
+    /**
+     * @Method PUT
+     * @Url {base}
+     */
+    public function thisIsSomethingCustom($id)
+    {
+        // ...
+    }
+}
+
+```
+
+Internally, the Crud handler's default methods are always available using the
+specified HTTP methods and URL. You can annotate them, too, if you for whatever
+reason need to override either. The `"{base}"` placeholder is simply replaced
+verbatim with the base URL you gave the `Api` constructor.
+
+## What's with that name, Monki?
+I'm bilingual, and in Dutch "API" is pronounced like the word for "little
+monkey". So that's why.
 
