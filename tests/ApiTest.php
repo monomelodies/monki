@@ -3,11 +3,13 @@
 namespace Monomelodies\Monki\Tests;
 
 use Monomelodies\Monki\Api;
+use Monomelodies\Monki\Handler\Crud;
 use Monolyth\Reroute\Router;
 use Zend\Diactoros\ServerRequestFactory;
 use PHPUnit_Extensions_Database_TestCase;
 use Quibble\Sqlite\Adapter;
 use Quibble\Query\Buildable;
+use Psr\Http\Message\RequestInterface;
 
 class ApiTest
 {
@@ -16,21 +18,29 @@ class ApiTest
     
     public function __construct()
     {
-        $base = realpath(dirname(__DIR__).'/../');
-        set_include_path(join(PATH_SEPARATOR, [
-            "$base/httpdocs",
-            "$base/src",
-            "$base/vendor",
-        ]));
-        if (self::$pdo === null) {
-            self::$pdo = new class(':memory:') extends Adapter {
-                use Buildable;
-            };
-            $schema = file_get_contents(
-                dirname(__FILE__).'/_files/schema.sql'
-            );
-            self::$pdo->exec($schema);
-        }
+        $this->handler = new class extends Crud {
+
+            public function browse()
+            {
+                return $this->jsonResponse([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]]);
+            }
+
+            public function create(RequestInterface $request)
+            {
+                return $this->jsonResponse($_POST);
+            }
+
+            public function retrieve($id)
+            {
+                return $this->jsonResponse(['id' => $id]);
+            }
+
+            public function update($id, RequestInterface $request)
+            {
+                return $this->jsonResponse($_POST);
+            }
+
+        };
     }
 
     public function __wakeup()
@@ -40,24 +50,24 @@ class ApiTest
     }
 
     /**
-     * @covers Monki\Api::browse
-     * @covers Monki\Endpoint\Item\Controller::create
+     * We can retrieve a list of json encoded items using browse {?}. We can
+     * post to create a new item {?}.
      */
     public function testBrowse()
     {
         $db = self::$pdo;
-        $api = new Api($db, '/');
-        $api->browse();
+        $api = new Api('/');
+        $api->crud('/foo/', '/:id/', $this->handler);
         $_SERVER['REQUEST_URI'] = '/foo/';
         $response = $api(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
-        $this->assertEquals(4, count($found));
+        yield assert(count($found) == 4);
         $_POST = ['content' => 'whee'];
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/foo/';
         $response = $api(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
-        $this->assertEquals('whee', $found['content']);
+        yield assert($found['content'] == 'whee');
     }
 
     /**
