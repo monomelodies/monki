@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6c8a4e7a07a63c1df953c144e1e24f8c",
-    "content-hash": "24a77dd24934ff5c862961557d824070",
+    "hash": "c997cf81abe1d5d2d940dad01e0f4976",
+    "content-hash": "bba1da903df2a9fa21e6a1d2e7a3f47d",
     "packages": [
         {
             "name": "jakeasmith/http_build_url",
@@ -155,16 +155,16 @@
         },
         {
             "name": "monolyth/reroute",
-            "version": "3.6.0",
+            "version": "3.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/monolyth-php/reroute.git",
-                "reference": "a555dc72eab1a9c8e8e2bcde676ccba29e3d0b82"
+                "reference": "7c1e9b0ad406d1978aca9864b30a96429640749f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/monolyth-php/reroute/zipball/a555dc72eab1a9c8e8e2bcde676ccba29e3d0b82",
-                "reference": "a555dc72eab1a9c8e8e2bcde676ccba29e3d0b82",
+                "url": "https://api.github.com/repos/monolyth-php/reroute/zipball/7c1e9b0ad406d1978aca9864b30a96429640749f",
+                "reference": "7c1e9b0ad406d1978aca9864b30a96429640749f",
                 "shasum": ""
             },
             "require": {
@@ -197,7 +197,7 @@
                 "php",
                 "router"
             ],
-            "time": "2016-09-30 06:56:56"
+            "time": "2016-09-30 10:04:35"
         },
         {
             "name": "psr/http-message",
@@ -394,173 +394,6 @@
             "time": "2016-07-15 06:21:55"
         },
         {
-            "name": "nesbot/carbon",
-            "version": "1.21.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "7b08ec6f75791e130012f206e3f7b0e76e18e3d7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/7b08ec6f75791e130012f206e3f7b0e76e18e3d7",
-                "reference": "7b08ec6f75791e130012f206e3f7b0e76e18e3d7",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "symfony/translation": "~2.6|~3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0|~5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Carbon\\": "src/Carbon/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Brian Nesbitt",
-                    "email": "brian@nesbot.com",
-                    "homepage": "http://nesbot.com"
-                }
-            ],
-            "description": "A simple API extension for DateTime.",
-            "homepage": "http://carbon.nesbot.com",
-            "keywords": [
-                "date",
-                "datetime",
-                "time"
-            ],
-            "time": "2015-11-04 20:07:17"
-        },
-        {
-            "name": "quibble/dabble",
-            "version": "1.7.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/quibble-dbal/dabble.git",
-                "reference": "dbfac04b0fd52f818589914db5189901003148a6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/quibble-dbal/dabble/zipball/dbfac04b0fd52f818589914db5189901003148a6",
-                "reference": "dbfac04b0fd52f818589914db5189901003148a6",
-                "shasum": ""
-            },
-            "require": {
-                "nesbot/carbon": "^1.21",
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "gentry/gentry": "^0.10.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Quibble\\Dabble\\": "./src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marijn Ophorst",
-                    "email": "marijn@monomelodies.nl"
-                }
-            ],
-            "description": "DBAL for Quibble",
-            "time": "2016-09-11 12:29:24"
-        },
-        {
-            "name": "quibble/query",
-            "version": "0.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/quibble-dbal/query.git",
-                "reference": "ab2e27708fcfc8d99fd3c369b906b213148f2ac3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/quibble-dbal/query/zipball/ab2e27708fcfc8d99fd3c369b906b213148f2ac3",
-                "reference": "ab2e27708fcfc8d99fd3c369b906b213148f2ac3",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0",
-                "quibble/dabble": "^1.7.2"
-            },
-            "require-dev": {
-                "gentry/gentry": "^0.10.2",
-                "quibble/sqlite": "^1.6"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Quibble\\Query\\": "./src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marijn Ophorst",
-                    "email": "marijn@monomelodies.nl"
-                }
-            ],
-            "description": "Query builder for Quibble",
-            "time": "2016-09-11 14:53:17"
-        },
-        {
-            "name": "quibble/sqlite",
-            "version": "1.6.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/quibble-dbal/sqlite.git",
-                "reference": "03d158a7e2ae9988e60a77fb414d7e94c8be0de4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/quibble-dbal/sqlite/zipball/03d158a7e2ae9988e60a77fb414d7e94c8be0de4",
-                "reference": "03d158a7e2ae9988e60a77fb414d7e94c8be0de4",
-                "shasum": ""
-            },
-            "require": {
-                "quibble/dabble": "^1.6"
-            },
-            "require-dev": {
-                "gentry/gentry": "^0.10.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Quibble\\Sqlite\\": "./src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marijn Ophorst",
-                    "email": "marijn@monomelodies.nl"
-                }
-            ],
-            "description": "SQLite adapter for Quibble",
-            "time": "2016-09-11 12:25:15"
-        },
-        {
             "name": "simoneast/simple-ansi-colors",
             "version": "1.0.1",
             "source": {
@@ -605,129 +438,6 @@
                 "console"
             ],
             "time": "2015-11-24 03:03:27"
-        },
-        {
-            "name": "symfony/polyfill-mbstring",
-            "version": "v1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "dff51f72b0706335131b00a7f49606168c582594"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/dff51f72b0706335131b00a7f49606168c582594",
-                "reference": "dff51f72b0706335131b00a7f49606168c582594",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "suggest": {
-                "ext-mbstring": "For best performance"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.2-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Mbstring\\": ""
-                },
-                "files": [
-                    "bootstrap.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill for the Mbstring extension",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "mbstring",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "time": "2016-05-18 14:26:46"
-        },
-        {
-            "name": "symfony/translation",
-            "version": "v3.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/translation.git",
-                "reference": "a35edc277513c9bc0f063ca174c36b346f974528"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/a35edc277513c9bc0f063ca174c36b346f974528",
-                "reference": "a35edc277513c9bc0f063ca174c36b346f974528",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5.9",
-                "symfony/polyfill-mbstring": "~1.0"
-            },
-            "conflict": {
-                "symfony/config": "<2.8"
-            },
-            "require-dev": {
-                "psr/log": "~1.0",
-                "symfony/config": "~2.8|~3.0",
-                "symfony/intl": "~2.8|~3.0",
-                "symfony/yaml": "~2.8|~3.0"
-            },
-            "suggest": {
-                "psr/log": "To use logging capability in translator",
-                "symfony/config": "",
-                "symfony/yaml": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Translation\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Translation Component",
-            "homepage": "https://symfony.com",
-            "time": "2016-08-05 08:37:39"
         },
         {
             "name": "symfony/yaml",
