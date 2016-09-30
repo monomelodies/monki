@@ -268,7 +268,7 @@ class MyHandler extends Crud
 {
     /**
      * @Method GET
-     * @Url {base}/count/
+     * @Url /count/
      */
     public function countIt()
     {
@@ -288,7 +288,6 @@ class MyHandler extends Crud
 {
     /**
      * @Method PUT
-     * @Url {base}
      */
     public function thisIsSomethingCustom($id)
     {
@@ -300,8 +299,9 @@ class MyHandler extends Crud
 
 Internally, the Crud handler's default methods are always available using the
 specified HTTP methods and URL. You can annotate them, too, if you for whatever
-reason need to override either. The `"{base}"` placeholder is simply replaced
-verbatim with the base URL you gave the `Api` constructor.
+reason need to override either. The `@Url` annotation is appended to whatever
+base URL you gave the `Api` constructor. If omitted it is that URL that will be
+used verbatim (e.g. to handle `HEAD` or `OPTIONS`).
 
 ## What's with that name, Monki?
 I'm bilingual, and in Dutch "API" is pronounced like the word for "little
