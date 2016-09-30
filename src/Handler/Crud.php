@@ -7,22 +7,7 @@ use Monomelodies\Monki\Response\JsonResponse;
 
 abstract class Crud
 {
-    public function browse()
-    {
-        return $this->emptyResponse(400);
-    }
-
-    public function retrieve()
-    {
-        return $this->emptyResponse(400);
-    }
-
-    public function update()
-    {
-        return $this->emptyResponse(400);
-    }
-
-    public function delete()
+    public function __call($fn, array $args)
     {
         return $this->emptyResponse(400);
     }
