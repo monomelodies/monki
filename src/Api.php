@@ -14,6 +14,7 @@ use Monomelodies\Monki\Response\JsonResponse;
 use Psr\Http\Message\RequestInterface;
 use Zend\Diactoros\Response\EmptyResponse;
 use League\Pipeline\StageInterface;
+use zpt\anno\Annotations;
 
 /**
  * Main Api class. This is what you'll usually work with.
@@ -40,25 +41,27 @@ class Api implements StageInterface
 
     public function crud($url, $param, Handler\Crud $handler)
     {
-        $defaults = [
-            '' => [
-                'then' => 'browse',
-                'post' => 'create',
-            ],
-            $param => [
-                'then' => 'retrieve',
-                'post' => 'update',
-                'delete' => 'delete',
-            ]
-        ];
         $router = $this->router->when($url);
-        foreach ($defaults as $suffix => $methods) {
-            if ($suffix) {
-                $subrouter = $router->when("$url$suffix");
+        $reflection = new ReflectionClass($handler);
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            $annotations = new Annotations($method);
+            $uri = $url;
+            if (isset($annotations['url'])) {
+                $uri .= $annotations['url'];
+            } else {
+                $uri .= $this->defaultUrlSuffixForAction($method->name);
             }
-            foreach ($methods as $httpMethod => $method) {
-                call_user_func([$suffix ? $subrouter : $router, $httpMethod], [$handler, $method]);
+            $subrouter = $router->when($uri);
+            $httpMethod = isset($annotations['method']) ?
+                strtolower($annotations['method']) :
+                $this->defaultHttpMethodForAction($method->name);
+            if ($httpMethod == 'get') {
+                $httpMethod = 'then';
             }
+            call_user_func(
+                [$uri == $url ? $router : $router, $httpMethod],
+                [$handler, $method->name]
+            );
         }
         return $router;
     }
@@ -131,6 +134,43 @@ class Api implements StageInterface
             return $payload;
         }
         return $this->router->__invoke($payload);
+    }
+
+    /**
+     * Private helper to get default HTTP methods.
+     *
+     * @param string $methodName
+     * @return string
+     */
+    private function defaultHttpMethodForAction(string $methodName) : string
+    {
+        switch ($methodName) {
+            case 'create':
+            case 'update':
+                return 'POST';
+            case 'delete':
+                return 'DELETE';
+            default:
+                return 'GET';
+        }
+    }
+
+    /**
+     * Private helper to get default URL suffixes.
+     *
+     * @param string $methodName
+     * @return string
+     */
+    private function defaultUrlSuffixForAction(string $methodName) : string
+    {
+        switch ($methodName) {
+            case 'update':
+            case 'retrieve':
+            case 'delete':
+                return '/:id/';
+            default:
+                return '';
+        }
     }
 }
 
