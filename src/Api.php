@@ -34,51 +34,49 @@ class Api implements StageInterface
      *
      * @param string $url Optional base URL. Defaults to '/'.
      */
-    public function __construct($url = '/')
+    public function __construct(string $url = '/')
     {
         $this->router = new Router($url);
     }
 
-    public function crud($url, $param, Handler\Crud $handler)
+    /**
+     * Register CRUD operations for a handler.
+     *
+     * @param string $url Base URL (appended to API-wide base URL).
+     * @param Monomelodies\Monki\Handler\Crud $handler
+     * @return Monolyth\Reroute\Router
+     */
+    public function crud(string $url, Handler\Crud $handler)
     {
         $router = $this->router->when($url);
         $reflection = new ReflectionClass($handler);
+        $subrouters = [];
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            $annotations = new Annotations($method);
-            $uri = $url;
-            if (isset($annotations['url'])) {
-                $uri .= $annotations['url'];
-            } else {
-                $uri .= $this->defaultUrlSuffixForAction($method->name);
+            if ($method->name == '__call') {
+                continue;
             }
-            $subrouter = $router->when($uri);
-            $httpMethod = isset($annotations['method']) ?
-                strtolower($annotations['method']) :
-                $this->defaultHttpMethodForAction($method->name);
+            $annotations = new Annotations($method);
+            $uri = '';
+            if (isset($annotations['url'])) {
+                $uri = $annotations['url'];
+            } else {
+                $uri = $this->defaultUrlSuffixForAction($method->name);
+            }
+            if ($uri && !isset($subrouters[$uri])) {
+                $subrouters[$uri] = $router->when($uri);
+            }
+            $httpMethod = strtolower(isset($annotations['method']) ?
+                $annotations['method'] :
+                $this->defaultHttpMethodForAction($method->name));
             if ($httpMethod == 'get') {
                 $httpMethod = 'then';
             }
             call_user_func(
-                [$uri == $url ? $router : $router, $httpMethod],
+                [$uri ? $subrouters[$uri] : $router, $httpMethod],
                 [$handler, $method->name]
             );
         }
         return $router;
-    }
-
-    /**
-     * Proxy to the internal `when` method of the Reroute router. Use this to
-     * specify custom routes/responses for your API.
-     *
-     * @param string $url The URL to intercept.
-     * @param callable $validate Optional validation pipeline.
-     * @return Reroute\Router A Reroute router.
-     * @see Reroute\Router::when
-     */
-    public function when($url, callable $validate = null)
-    {
-        $validate = $this->validate($validate);
-        return $this->router->when($url)->pipe($validate);
     }
 
     /**
@@ -91,22 +89,6 @@ class Api implements StageInterface
     public function pipe(callable $callback)
     {
         return $this->router->pipe($callback);
-    }
-
-    /**
-     * Wrap the validation callable in a Monki\Stage object to respect the
-     * League\Pipeline\StageInterface contract.
-     *
-     * @param callable $validate Optional callback used to check if current user
-     *  has access to this feature.
-     * @return Monki\Stage The callable wrapped in a Stage object.
-     */
-    protected function validate(callable $validate = null)
-    {
-        if (!isset($validate)) {
-            $validate = function ($payload) { return $payload; };
-        }
-        return new Stage($validate);
     }
 
     /**
