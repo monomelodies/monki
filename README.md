@@ -98,14 +98,14 @@ class MyHandler extends Crud
 {
 }
 
-$monki->crud('/api/user/:id?/', new MyHandler);
+$monki->crud('/api/user/', '/:id/', new MyHandler);
 
 ```
 
 In the above example, we simply pass it an instance of the `Crud` handler
 interface. The return value of the `crud` method can again be pipelined, e.g.
-for access checks. The question mark after the `":id"` parameter tells Reroute
-it is an optional parameter.
+for access checks. The first parameter is the base path of the endpoint, the
+second the one for resource-specific endpoints.
 
 If you try to access the URL `/api/user/`, you won't get a list of users yet but
 rather a `Zend\Diactoros\Response\EmptyResponse` with a status code of 501 (not
@@ -121,7 +121,7 @@ use Monomelodies\Monki\Handler\Crud;
 
 class MyHandler extends Crud
 {
-    public function browse($id = null)
+    public function browse()
     {
         // This should e.g. do a database query in real life:
         $users = ['Marijn', 'Linus', 'Bill'];
@@ -135,9 +135,9 @@ The list of default supported handlers is as follows:
 
 - `Handler\Crud::browse`
 - `Handler\Crud::create`
-- `Handler\Crud::retrieve`
-- `Handler\Crud::update`
-- `Handler\Crud::delete`
+- `Handler\Crud::retrieve(...params)`
+- `Handler\Crud::update(...params)`
+- `Handler\Crud::delete(...params)`
 
 To reuse your handler for multiple tables, you could e.g. pass the table name in
 the constructor and store it privately.
@@ -205,7 +205,7 @@ class MyHandler extends Crud implements Browse, Create, Retrieve, Update, Delete
 }
 
 // Assuming $user contains the currently logged in user...
-$monki->crud('/api/user/:id/', new MyHandler($db, 'user'))
+$monki->crud('/api/user/', '/:id/', new MyHandler($db, 'user'))
     ->pipe(function ($payload) use ($user) {
         if ($user->name != 'Marijn') {
             // Bad user! No access.
@@ -230,12 +230,12 @@ $check = function ($payload) use ($user) {
     }
     return $payload;
 };
-$monki->crud('/api/user/:id/', new MyHandler($db, 'user'))->pipe($check);
-$monki->crud('/api/message/:id/', new MyHandler($db, 'message'))->pipe($check);
-$monki->crud('/api/foo/:id/', new MyHandler($db, 'foo'))->pipe($check);
-$monki->crud('/api/bar/:id/', new MyHandler($db, 'bar'))->pipe($check);
+$monki->crud('/api/user/', '/:id/', new MyHandler($db, 'user'))->pipe($check);
+$monki->crud('/api/message/', '/:id/', new MyHandler($db, 'message'))->pipe($check);
+$monki->crud('/api/foo/', '/:id/', new MyHandler($db, 'foo'))->pipe($check);
+$monki->crud('/api/bar/', '/:id/', new MyHandler($db, 'bar'))->pipe($check);
 // This endpoint is open for the world (usually a bad idea ;)):
-$monki->crud('/api/baz/:id/', new MyHandler($db, 'baz'));
+$monki->crud('/api/baz/', '/:id/', new MyHandler($db, 'baz'));
 // ...
 
 ```
@@ -245,16 +245,16 @@ results in a 400 Bad Request response. You can always catch these errors in your
 handler itself and return something more appropriate if you wish.
 
 ## Transforming responses
-Monki comes with `League\Fractal` bundled as a dependency. Using Fractal, you
-can add "transformers" to your responses. To do so, pass a transformer object
-extending `League\Fractal\TransformerAbstract` as a third argument to the `crud`
-method. See their documentation for more information on this. Any response that
-isn't Json will ignore the transformer.
+Similar to passing a PDO adapter and table name in the constructor of your
+handler, one might also pass a _transformer_ (or inject it via other means).
+Transformers are classes or callables that "massage" your raw data before
+dumping it into the wide open. This is something you would implement yourself;
+Monki doesn't want to make assumptions. But we recommend `League\Fractal` for
+this; it's a very versatile transformation tool.
 
-Using a transformer is very handy for massaging your data prior to emitting a
-response. E.g., in our user example the table would likely also contain a `pass`
-column which we don't want to expose. Or we could use it to cast the user id to
-an actual integer instead of a string.
+E.g., in our user example the table would likely also contain a `pass` column
+which we don't want to expose. Or we could use it to cast the user id to an
+actual integer instead of a string.
 
 ## Adding custom methods
 Let's say we also need to add endpoints to the API for counting the total number
