@@ -7,11 +7,6 @@ use Monomelodies\Monki\Response\JsonResponse;
 
 abstract class Crud
 {
-    public function __call($fn, array $args)
-    {
-        return $this->emptyResponse(400);
-    }
-
     protected function jsonResponse($data, $code = 200)
     {
         return new JsonResponse($data, $code);
