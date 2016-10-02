@@ -108,9 +108,9 @@ for access checks. The first parameter is the base path of the endpoint, the
 second the one for resource-specific endpoints.
 
 If you try to access the URL `/api/user/`, you won't get a list of users yet but
-rather a `Zend\Diactoros\Response\EmptyResponse` with a status code of 501 (not
-implemented). This makes sense, since our handler doesn't actually specify any
-handling yet! Hey, come on, Monki isn't clairvoyant...
+rather find the API router returns `NULL`. This makes sense, since our handler
+doesn't actually specify any handling yet! Hey, come on, Monki has some defaults
+but it isn't clairvoyant...
 
 Let's first make it respond to `browse`-style requests:
 
@@ -240,17 +240,14 @@ $monki->crud('/api/baz/', '/:id/', new MyHandler($db, 'baz'));
 
 ```
 
-For convenience, any CRUD method throwing an exception by default automatically
-results in a 400 Bad Request response. You can always catch these errors in your
-handler itself and return something more appropriate if you wish.
-
 ## Transforming responses
 Similar to passing a PDO adapter and table name in the constructor of your
 handler, one might also pass a _transformer_ (or inject it via other means).
 Transformers are classes or callables that "massage" your raw data before
 dumping it into the wide open. This is something you would implement yourself;
-Monki doesn't want to make assumptions. But we recommend `League\Fractal` for
-this; it's a very versatile transformation tool.
+Monki doesn't want to make assumptions. But we recommend `league/fractal` for
+this; it's a very versatile transformation tool. For simpler query result
+transformation you could also consider `quibble/transformer`.
 
 E.g., in our user example the table would likely also contain a `pass` column
 which we don't want to expose. Or we could use it to cast the user id to an
@@ -279,7 +276,7 @@ class MyHandler extends Crud
 ```
 
 To define a custom method for an endpoint with a resource, simply require the
-associated parameters in the method:
+associated parameters in the method and specify a custom URL:
 
 ```php
 <?php
@@ -288,6 +285,7 @@ class MyHandler extends Crud
 {
     /**
      * @Method PUT
+     * @Url /custom/:id/
      */
     public function thisIsSomethingCustom($id)
     {
@@ -302,9 +300,6 @@ specified HTTP methods and URL. You can annotate them, too, if you for whatever
 reason need to override either. The `@Url` annotation is appended to whatever
 base URL you gave the `Api` constructor. If omitted it is that URL that will be
 used verbatim (e.g. to handle `HEAD` or `OPTIONS`).
-
-You can also annotate a default method with either an `"@Method"` or `"@Url"`
-annotation to override the default value if you need to.
 
 ## Handling things like pagination etc. based on GET or POST parameters
 Knock yourself out in your handlers! You could also transform your data here,
