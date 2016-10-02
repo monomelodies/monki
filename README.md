@@ -98,7 +98,7 @@ class MyHandler extends Crud
 {
 }
 
-$monki->crud('/api/user/', '/:id/', new MyHandler);
+$monki->crud('/api/user/', new MyHandler);
 
 ```
 
@@ -133,11 +133,11 @@ class MyHandler extends Crud
 
 The list of default supported handlers is as follows:
 
-- `Handler\Crud::browse`
-- `Handler\Crud::create`
-- `Handler\Crud::retrieve(...params)`
-- `Handler\Crud::update(...params)`
-- `Handler\Crud::delete(...params)`
+- `GET Handler\Crud::browse`
+- `POST Handler\Crud::create`
+- `GET Handler\Crud::retrieve(...params)`
+- `POST Handler\Crud::update(...params)`
+- `DELETE Handler\Crud::delete(...params)`
 
 To reuse your handler for multiple tables, you could e.g. pass the table name in
 the constructor and store it privately.
@@ -303,9 +303,14 @@ reason need to override either. The `@Url` annotation is appended to whatever
 base URL you gave the `Api` constructor. If omitted it is that URL that will be
 used verbatim (e.g. to handle `HEAD` or `OPTIONS`).
 
+You can also annotate a default method with either an `"@Method"` or `"@Url"`
+annotation to override the default value if you need to.
+
 ## Handling things like pagination etc. based on GET or POST parameters
 Knock yourself out in your handlers! You could also transform your data here,
-e.g. `json_encode` certain fields before storage.
+e.g. `json_encode` certain fields before storage. Useful packages for this might
+be [League/Fractal](http://fractal.thephpleague.com/) and
+[Quibble/Transformer](http://quibble.monomelodies.nl/transformer/).
 
 ## What's with that name, Monki?
 I'm bilingual, and in Dutch "API" is pronounced like the word for "little
