@@ -40,6 +40,15 @@ class ApiTest
                 return $this->jsonResponse($_POST);
             }
 
+            /**
+             * @Method PUT
+             * @Url /:id/custom/
+             */
+            public function custom($id)
+            {
+                return $this->jsonResponse(['type' => 'custom']);
+            }
+
         };
     }
 
@@ -55,9 +64,8 @@ class ApiTest
      */
     public function testBrowse()
     {
-        $db = self::$pdo;
         $api = new Api('/');
-        $api->crud('/foo/', '/:id/', $this->handler);
+        $api->crud('/foo/', $this->handler);
         $_SERVER['REQUEST_URI'] = '/foo/';
         $response = $api(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
@@ -71,47 +79,20 @@ class ApiTest
     }
 
     /**
-     * @covers Monki\Api::count
-    public function testCount()
-    {
-        $db = self::$pdo;
-        $api = new Api($db, '/');
-        $api->count();
-        $_SERVER['REQUEST_URI'] = '/foo/count/';
-        $response = $api(ServerRequestFactory::fromGlobals());
-        $found = json_decode($response->getBody(), true);
-        $this->assertEquals(4, $found['count']);
-    }
+     * We can call our custom PUT method {?} and it gives the expected
+     * custom result {?}.
      */
-
-    /**
-     * @covers Monki\Api::item
-     * @covers Monki\Endpoint\Item\Controller::update
-     * @covers Monki\Endpoint\Item\Controller::delete
-    public function testItem()
+    public function testCustom()
     {
-        $db = self::$pdo;
-        $api = new Api($db, '/');
-        $api->count();
-        $api->item();
-        $_SERVER['REQUEST_URI'] = '/foo/1/';
+        $api = new Api('/');
+        $api->crud('/foo/', $this->handler);
+        $_SERVER['REQUEST_URI'] = '/foo/1/custom/';
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
         $response = $api(ServerRequestFactory::fromGlobals());
-        $found = json_decode($response->getBody(), true);
-        $this->assertEquals('bar', $found['content']);
-        $_POST = ['content' => 'boo'];
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_SERVER['REQUEST_URI'] = '/foo/1/';
-        $response = $api(ServerRequestFactory::fromGlobals());
-        $found = json_decode($response->getBody(), true);
-        $this->assertEquals('boo', $found['content']);
-        $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $response = $api(ServerRequestFactory::fromGlobals());
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['REQUEST_URI'] = '/foo/count/';
-        $response = $api(ServerRequestFactory::fromGlobals());
-        $found = json_decode($response->getBody(), true);
-        $this->assertEquals(3, $found['count']);
+        if ($response) {
+            $found = json_decode($response->getBody(), true);
+        }
+        yield assert($found['type'] == 'custom');
     }
-     */
 }
 
