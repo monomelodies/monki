@@ -52,7 +52,7 @@ class Api implements StageInterface
         $reflection = new ReflectionClass($handler);
         $subrouters = [];
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->name == '__call') {
+            if ($method->name{0} == '_') {
                 continue;
             }
             $annotations = new Annotations($method);
