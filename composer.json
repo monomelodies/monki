@@ -24,7 +24,7 @@
         "ext-pcre": "*",
         "ext-reflection": "*",
         "ext-spl": "*",
-        "monolyth/reroute": "^3.6.0",
+        "monolyth/reroute": "^3.8.0",
         "zendframework/zend-diactoros": "^1.2@dev",
         "league/fractal": "^0.14.0"
     },
