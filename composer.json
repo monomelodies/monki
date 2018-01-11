@@ -1,6 +1,6 @@
 {
     "name": "monomelodies/monki",
-    "description": "PHP5 API generation utilities",
+    "description": "PHP7.1+ API generation utilities",
     "type": "library",
     "keywords": [
         "php5",
