@@ -14,7 +14,7 @@ class JsonResponse extends HtmlResponse
      * @param int $status Status code, typically 200 (the default).
      * @param array $headers Optional custom headers.
      */
-    public function __construct($data, $status = 200, array $headers = [])
+    public function __construct($data, int $status = 200, array $headers = [])
     {
         $json = json_encode($data);
         $headers['content-type'] = 'application/json; charset=utf-8';
