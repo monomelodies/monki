@@ -46,7 +46,7 @@ class Api implements StageInterface
      * @param Monomelodies\Monki\Handler\Crud $handler
      * @return Monolyth\Reroute\Router
      */
-    public function crud(string $url, Handler\Crud $handler)
+    public function crud(string $url, Handler\Crud $handler) : Router
     {
         $router = $this->router->when($url);
         $reflection = new ReflectionClass($handler);
@@ -82,13 +82,13 @@ class Api implements StageInterface
     /**
      * Proxy to the `pipe` method of the Reroute router.
      *
-     * @param callable $callback The callback to pipe.
-     * @return Reroute\Router A Reroute router.
+     * @param callable ...$callbacks The callbacks to pipe.
+     * @return Monolyth\Reroute\Router A Reroute router.
      * @see Reroute\Router::pipe
      */
-    public function pipe(callable $callback)
+    public function pipe(callable ...$callbacks) : Router
     {
-        return $this->router->pipe($callback);
+        return $this->router->pipe(...$callbacks);
     }
 
     /**
