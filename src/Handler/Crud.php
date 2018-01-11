@@ -14,7 +14,7 @@ abstract class Crud
      * @param int $code HTTP response code, defaults to 200 (OK).
      * @return Monomelodies\Monki\Response\JsonResponse
      */
-    protected function jsonResponse($data, $code = 200) : JsonResponse
+    protected function jsonResponse($data, int $code = 200) : JsonResponse
     {
         return new JsonResponse($data, $code);
     }
@@ -25,7 +25,7 @@ abstract class Crud
      * @param int $code HTTP response code, defaults to 200 (OK).
      * @return Zend\Diactoros\Response\EmptyResponse
      */
-    protected function emptyResponse($code = 200) : EmptyResponse
+    protected function emptyResponse(int $code = 200) : EmptyResponse
     {
         return new EmptyResponse($code);
     }
