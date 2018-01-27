@@ -37,6 +37,7 @@ class Api implements StageInterface
     public function __construct(string $url = '/')
     {
         $this->router = new Router($url);
+        $this->stage = $this->router->when('/');
     }
 
     /**
@@ -48,9 +49,11 @@ class Api implements StageInterface
      */
     public function crud(string $url, Handler\Crud $handler) : Router
     {
-        $router = $this->router->when($url);
+        $stage = $this->router->when($url, null, function ($r) use (&$router) {
+            $router = $r;
+        });
         $reflection = new ReflectionClass($handler);
-        $subrouters = [];
+        $stages = [];
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             if ($method->name{0} == '_') {
                 continue;
@@ -62,17 +65,14 @@ class Api implements StageInterface
             } else {
                 $uri = $this->defaultUrlSuffixForAction($method->name);
             }
-            if ($uri && !isset($subrouters[$uri])) {
-                $subrouters[$uri] = $router->when($uri);
+            if ($uri && !isset($stages[$uri])) {
+                $stages[$uri] = $router->when($uri);
             }
             $httpMethod = strtolower(isset($annotations['method']) ?
                 $annotations['method'] :
                 $this->defaultHttpMethodForAction($method->name));
-            if ($httpMethod == 'get') {
-                $httpMethod = 'then';
-            }
             call_user_func(
-                [$uri ? $subrouters[$uri] : $router, $httpMethod],
+                [$uri ? $stages[$uri] : $stage, $httpMethod],
                 [$handler, $method->name]
             );
         }
@@ -80,15 +80,15 @@ class Api implements StageInterface
     }
 
     /**
-     * Proxy to the `pipe` method of the Reroute router.
+     * Proxy to the `pipe` method of the underlying base stage.
      *
      * @param callable ...$callbacks The callbacks to pipe.
      * @return Monolyth\Reroute\Router A Reroute router.
      * @see Reroute\Router::pipe
      */
-    public function pipe(callable ...$callbacks) : Router
+    public function pipe(callable ...$callbacks)
     {
-        return $this->router->pipe(...$callbacks);
+        return $this->stage->pipe(...$callbacks);
     }
 
     /**
