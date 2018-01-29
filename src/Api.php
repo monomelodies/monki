@@ -8,6 +8,7 @@ use PDOException;
 use ReflectionClass;
 use ReflectionMethod;
 use Monolyth\Reroute\Router;
+use Monolyth\Reroute\State;
 use Monomelodies\Monki\Endpoint\Item;
 use Monomelodies\Monki\Endpoint\Browse;
 use Monomelodies\Monki\Response\JsonResponse;
@@ -34,9 +35,9 @@ class Api implements StageInterface
      *
      * @param string $url Optional base URL. Defaults to '/'.
      */
-    public function __construct(string $url = '/')
+    public function __construct(Router $router)
     {
-        $this->router = new Router($url);
+        $this->router = $router;
         $this->stage = $this->router->when('/');
     }
 
@@ -45,38 +46,36 @@ class Api implements StageInterface
      *
      * @param string $url Base URL (appended to API-wide base URL).
      * @param Monomelodies\Monki\Handler\Crud $handler
-     * @return Monolyth\Reroute\Router
+     * @return Monolyth\Reroute\State
      */
-    public function crud(string $url, Handler\Crud $handler) : Router
+    public function crud(string $url, Handler\Crud $handler) : State
     {
-        $stage = $this->router->when($url, null, function ($r) use (&$router) {
-            $router = $r;
+        return $this->router->when($url, null, function ($router) use ($handler, $url) {
+            $reflection = new ReflectionClass($handler);
+            $stages = [];
+            foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+                if ($method->name{0} == '_') {
+                    continue;
+                }
+                $annotations = new Annotations($method);
+                $uri = '';
+                if (isset($annotations['url'])) {
+                    $uri = $annotations['url'];
+                } else {
+                    $uri = $this->defaultUrlSuffixForAction($method->name);
+                }
+                if ($uri && !isset($stages[$uri])) {
+                    $stages[$uri] = $router->when($uri);
+                }
+                $httpMethod = strtolower(isset($annotations['method']) ?
+                    $annotations['method'] :
+                    $this->defaultHttpMethodForAction($method->name));
+                call_user_func(
+                    [$stages[$uri], $httpMethod],
+                    [$handler, $method->name]
+                );
+            }
         });
-        $reflection = new ReflectionClass($handler);
-        $stages = [];
-        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->name{0} == '_') {
-                continue;
-            }
-            $annotations = new Annotations($method);
-            $uri = '';
-            if (isset($annotations['url'])) {
-                $uri = $annotations['url'];
-            } else {
-                $uri = $this->defaultUrlSuffixForAction($method->name);
-            }
-            if ($uri && !isset($stages[$uri])) {
-                $stages[$uri] = $router->when($uri);
-            }
-            $httpMethod = strtolower(isset($annotations['method']) ?
-                $annotations['method'] :
-                $this->defaultHttpMethodForAction($method->name));
-            call_user_func(
-                [$uri ? $stages[$uri] : $stage, $httpMethod],
-                [$handler, $method->name]
-            );
-        }
-        return $router;
     }
 
     /**
@@ -151,7 +150,7 @@ class Api implements StageInterface
             case 'delete':
                 return '/:id/';
             default:
-                return '';
+                return '/';
         }
     }
 }
