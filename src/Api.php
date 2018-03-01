@@ -75,7 +75,7 @@ class Api implements StageInterface
                     [$handler, $method->name]
                 );
             }
-        });
+        })->pipe(...$this->stage->getPipeline());;
     }
 
     /**
@@ -99,22 +99,6 @@ class Api implements StageInterface
     public function process($payload = null)
     {
         return $this($payload);
-    }
-
-    /**
-     * Process the payload. If it is already an instance of RequestInterface, we
-     * assume the pipeline was already resolved. Otherwise delegate control to
-     * the internal router.
-     *
-     * @param mixed $payload
-     * @return mixed Whatever our router comes up with.
-     */
-    public function __invoke($payload = null)
-    {
-        if (isset($payload) && !($payload instanceof RequestInterface)) {
-            return $payload;
-        }
-        return $this->router->__invoke($payload);
     }
 
     /**
