@@ -30,10 +30,10 @@ class Api implements StageInterface
     protected $router;
 
     /**
-     * Constructor. Pass in the base URL your API should live under (e.g.
-     * `"/api/"`).
+     * Constructor. Pass in a Router instance.
      *
-     * @param string $url Optional base URL. Defaults to '/'.
+     * @param Monolyth\Reroute\Router $router
+     * @return void
      */
     public function __construct(Router $router)
     {
