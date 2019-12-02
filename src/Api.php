@@ -9,21 +9,16 @@ use ReflectionClass;
 use ReflectionMethod;
 use Monolyth\Reroute\Router;
 use Monolyth\Reroute\State;
-use Monomelodies\Monki\Endpoint\Item;
-use Monomelodies\Monki\Endpoint\Browse;
-use Monomelodies\Monki\Response\JsonResponse;
-use Psr\Http\Message\RequestInterface;
-use Zend\Diactoros\Response\EmptyResponse;
-use League\Pipeline\StageInterface;
 use zpt\anno\Annotations;
 
 /**
  * Main Api class. This is what you'll usually work with.
  */
-class Api implements StageInterface
+class Api
 {
     /**
      * @var Reroute\Router
+     *
      * Monki uses Reroute internally to resolve URLs. This has no bearing on
      * your own routing solution.
      */
@@ -85,20 +80,9 @@ class Api implements StageInterface
      * @return Monolyth\Reroute\Router A Reroute router.
      * @see Reroute\Router::pipe
      */
-    public function pipe(callable ...$callbacks)
+    public function pipe(callable ...$callbacks) : Router
     {
         return $this->stage->pipe(...$callbacks);
-    }
-
-    /**
-     * Process the payload. A front to __invoke.
-     *
-     * @param mixed $payload
-     * @return mixed Whatever our router comes up with.
-     */
-    public function process($payload = null)
-    {
-        return $this($payload);
     }
 
     /**
