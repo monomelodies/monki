@@ -77,10 +77,10 @@ class Api
      * Proxy to the `pipe` method of the underlying base stage.
      *
      * @param callable ...$callbacks The callbacks to pipe.
-     * @return Monolyth\Reroute\Router A Reroute router.
-     * @see Reroute\Router::pipe
+     * @return Monolyth\Reroute\Stage A Reroute stage.
+     * @see Monolyth\Reroute\Stage::pipe
      */
-    public function pipe(callable ...$callbacks) : Router
+    public function pipe(callable ...$callbacks) : Stage
     {
         return $this->stage->pipe(...$callbacks);
     }
