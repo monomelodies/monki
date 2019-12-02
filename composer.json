@@ -24,12 +24,14 @@
         "ext-pcre": "*",
         "ext-reflection": "*",
         "ext-spl": "*",
-        "monolyth/reroute": "^4.0.0",
+        "monolyth/reroute": "^5.0.0",
         "zendframework/zend-diactoros": "^1.2@dev",
         "league/fractal": "^0.14.0"
     },
     "require-dev": {
-        "gentry/gentry": "^0.10.2"
+        "toast/unit": "^2.0",
+        "gentry/gentry": "^0.13.12",
+        "gentry/toast": "^0.1.1"
     },
     "autoload": {
         "psr-4": {
