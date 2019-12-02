@@ -49,35 +49,31 @@ return function () : Generator {
         $_SERVER['REQUEST_METHOD'] = 'GET';
     });
 
-    /**
-     * We can retrieve a list of json encoded items using browse. We can
-     * post to create a new item.
-     */
-    yield function () {
-        $api = new Api('/');
-        $api->crud('/foo/', $this->handler);
+    /** We can retrieve a list of json encoded items using browse. We can post to create a new item. */
+    yield function () use (&$handler) {
+        $router = new Router('/');
+        $api = new Api($router);
+        $api->crud('/foo/', $handler);
         $_SERVER['REQUEST_URI'] = '/foo/';
-        $response = $api(ServerRequestFactory::fromGlobals());
+        $response = $router(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
         assert(count($found) == 4);
         $_POST = ['content' => 'whee'];
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/foo/';
-        $response = $api(ServerRequestFactory::fromGlobals());
+        $response = $router(ServerRequestFactory::fromGlobals());
         $found = json_decode($response->getBody(), true);
         assert($found['content'] == 'whee');
     };
 
-    /**
-     * We can call our custom PUT method {?} and it gives the expected
-     * custom result {?}.
-     */
-    yield function () {
-        $api = new Api('/');
-        $api->crud('/foo/', $this->handler);
+    /** We can call our custom PUT method and it gives the expected custom result. */
+    yield function () use (&$handler) {
+        $router = new Router('/');
+        $api = new Api($router);
+        $api->crud('/foo/', $handler);
         $_SERVER['REQUEST_URI'] = '/foo/1/custom/';
         $_SERVER['REQUEST_METHOD'] = 'PUT';
-        $response = $api(ServerRequestFactory::fromGlobals());
+        $response = $router(ServerRequestFactory::fromGlobals());
         if ($response) {
             $found = json_decode($response->getBody(), true);
         }
