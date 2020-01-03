@@ -25,8 +25,8 @@
         "ext-reflection": "*",
         "ext-spl": "*",
         "monolyth/reroute": "^5.0.0",
-        "zendframework/zend-diactoros": "^1.2@dev",
-        "league/fractal": "^0.14.0"
+        "league/fractal": "^0.14.0",
+        "laminas/laminas-diactoros": "^2.2"
     },
     "require-dev": {
         "toast/unit": "^2.0",
