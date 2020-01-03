@@ -2,7 +2,7 @@
 
 namespace Monomelodies\Monki\Handler;
 
-use Zend\Diactoros\Response\EmptyResponse;
+use Laminas\Diactoros\Response\EmptyResponse;
 use Monomelodies\Monki\Response\JsonResponse;
 
 abstract class Crud
@@ -23,7 +23,7 @@ abstract class Crud
      * Return an empty reponse.
      *
      * @param int $code HTTP response code, defaults to 200 (OK).
-     * @return Zend\Diactoros\Response\EmptyResponse
+     * @return Laminas\Diactoros\Response\EmptyResponse
      */
     protected function emptyResponse(int $code = 200) : EmptyResponse
     {
