@@ -2,7 +2,7 @@
 
 namespace Monomelodies\Monki\Response;
 
-use Zend\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\HtmlResponse;
 
 /**
  * Simple extension to HtmlResponse to easily return Json responses.
