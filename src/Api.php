@@ -49,7 +49,7 @@ class Api
             $reflection = new ReflectionClass($handler);
             $stages = [];
             foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-                if ($method->name{0} == '_') {
+                if (substr($method->name, 0, 1) == '_') {
                     continue;
                 }
                 $annotations = new Annotations($method);
