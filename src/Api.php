@@ -3,12 +3,9 @@
 namespace Monomelodies\Monki;
 
 use StdClass;
-use PDO;
-use PDOException;
-use ReflectionClass;
-use ReflectionMethod;
-use Monolyth\Reroute\Router;
-use Monolyth\Reroute\State;
+use PDO, PDOException;
+use ReflectionClass, ReflectionMethod;
+use Monolyth\Reroute\{ Router, State };
 use zpt\anno\Annotations;
 
 /**
@@ -22,8 +19,9 @@ class Api
      * Monki uses Reroute internally to resolve URLs. This has no bearing on
      * your own routing solution.
      */
-    protected $router;
+    protected Router $router;
 
+    protected State $stage;
     /**
      * Constructor. Pass in a Router instance.
      *
