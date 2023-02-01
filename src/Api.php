@@ -14,14 +14,13 @@ use zpt\anno\Annotations;
 class Api
 {
     /**
-     * @var Reroute\Router
-     *
      * Monki uses Reroute internally to resolve URLs. This has no bearing on
      * your own routing solution.
      */
     protected Router $router;
 
     protected State $stage;
+
     /**
      * Constructor. Pass in a Router instance.
      *
