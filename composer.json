@@ -26,7 +26,8 @@
         "ext-spl": "*",
         "monolyth/reroute": "^5.0.0",
         "league/fractal": "^0.14.0",
-        "laminas/laminas-diactoros": "^2.2"
+        "laminas/laminas-diactoros": "^2.2",
+        "zeptech/annotations": "^1.2"
     },
     "require-dev": {
         "toast/unit": "^2.0",
