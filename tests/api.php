@@ -3,7 +3,7 @@
 use Monomelodies\Monki\Api;
 use Monomelodies\Monki\Handler\Crud;
 use Monolyth\Reroute\Router;
-use Zend\Diactoros\ServerRequestFactory;
+use Laminas\Diactoros\ServerRequestFactory;
 use Quibble\Sqlite\Adapter;
 use Quibble\Query\Buildable;
 use Psr\Http\Message\RequestInterface;
